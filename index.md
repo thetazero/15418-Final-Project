@@ -24,9 +24,9 @@ Lastly, finding an effective mechanism and mapping of our data to CUDA threads a
 
 # Resources
 We will use computers that support high amounts of task-level parallelism (either via MPI nodes or threads for openMP) and have a GPU, such as the ones we have previously used for labs. 
-Our code base will start from a basic implementation of Minimax search. (E.g. https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/)
+Our code base will start from a basic implementation of Minimax search. (E.g. [geeks for geeks minimax alg](https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-4-alpha-beta-pruning/))
 Potential Evaluation Algorithms:
-https://dr.lib.iastate.edu/server/api/core/bitstreams/39a805d5-8f5b-41e6-b07c-19c07229f813/content
+[New Heuristic Algorithm to improve the Minimax for Gomoku Artificial Intelligence](https://dr.lib.iastate.edu/server/api/core/bitstreams/39a805d5-8f5b-41e6-b07c-19c07229f813/content)
 
 TODO: Find other resources about parallelizing minimax or evaluating connect 5 board
 
@@ -59,7 +59,7 @@ TODO
 4. Implement basic sequential evaluation function
 5. Test out our implementations and make basic improvements to sequential version
 6 .Gather performance metrics on sequential version
-7. Plan out how we will parallelize the game tree search based on our sequential implementation |
+7. Plan out how we will parallelize the game tree search based on our sequential implementation 
 
 ## 4/8 - 4/14
 1. Implement basic parallel versions of minimax with/without pruning
