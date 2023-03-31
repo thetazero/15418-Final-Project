@@ -51,13 +51,35 @@ TODO
 
 # Schedule
 
-| Week | Goals |
-| --- | --- |
-| 4/1-7 | 1. Implement basic framework/interface for connect 5 (e.g. rules of game, getting next move, game over, etc…)
+## 4/1 - 4/7
+1. Implement basic framework/interface for connect 5 (e.g. rules of game, getting next move, game over, etc…)
 2. Create interface to work with (e.g. GUI for board, how to feed the board into engine, etc…)
 3. Implement basic sequential versions of minimax with/without pruning
 4. Implement basic sequential evaluation function
 5. Test out our implementations and make basic improvements to sequential version
 6 .Gather performance metrics on sequential version
 7. Plan out how we will parallelize the game tree search based on our sequential implementation |
+
+## 4/8 - 4/14
+1. Implement basic parallel versions of minimax with/without pruning
+2. Test out performance, gather metrics for different search depths/breadths
+3. Try different ways of workload assignment for searching the branches
+4. Plan out how to approach parallelizing the evaluation function
+
+## 4/15 - 4/19 (midterm report due)
+1. Write milestone report
+2. Begin to implement parallelization of evaluation function in a vacuum
+
+## 4/19 - 4/29
+1. Finish implementing basic parallel evaluation in a vacuum
+2. Test performance, gather metrics, try different workload assignments
+3. Integrate parallelization of evaluation function with the parallelization of search tree
+4. Test how well the integration works and scales to more processors
+5. Test how strong the engine plays at high depths
+
+## 4/30 - 5/6
+1. Final touch-ups on project
+2. Write final paper
+3. Prepare presentation materials
+
 
