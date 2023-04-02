@@ -38,6 +38,7 @@ public:
 
   // make move for whoever's turn is up on board[r,c]
   virtual int make_move(int r, int c);
+  virtual int make_move(int i);
 
   // save the existing board to a file
   void save_board(string filename);

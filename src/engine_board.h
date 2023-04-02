@@ -2,6 +2,8 @@
 #define ENGINE_BOARD_H
 
 #include "board.h"
+#include <vector>
+
 using namespace std;
 
 const int GAME_OVER_EVAL = 10000;
@@ -19,13 +21,17 @@ public:
     Engine_Board(int board_size);
     Engine_Board(string filename);
     
-    void get_candidate_moves();
+    // returns the index of board positions for the moves
+    // call make_move(idx) to make one of the moves
+    vector<int> get_candidate_moves();
     
     // returns the evaluation of any given position
     int eval();
 
-    // updates the list of moves
+    // move at board position (r,c)
     int make_move(int r, int c);
+    // move at board index i
+    int make_move(int i);
 
 protected:
     // bounds of search, give a buffer of 1 row/col on each side where possible
@@ -37,7 +43,7 @@ private:
     void print_bounds();
 
     // check for 5 in a row from (r,c) in rows, cols, diags
-    // also ch
+    // also check for live 4's and 3's
     int check_5_straight(int r, int c, 
                          int &x_4_count, int &o_4_count, 
                          int &x_3_count, int &o_3_count);

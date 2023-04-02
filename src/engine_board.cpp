@@ -24,9 +24,26 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
   }
 }
 
-void Engine_Board::get_candidate_moves() {
+vector<int> Engine_Board::get_candidate_moves() {
   // most basic: return vector of empty spots within the search space
   // smarter: first keep track of forced move squares (e.g. to stop live 4's and 3's)
+  vector<int> moves;
+
+  // if empty board, just return the center square
+  if (r_max < 0) {
+    moves.push_back(idx(size/2, size/2));
+    return moves;
+  }
+
+  for (int r = r_min; r <= r_max; r++) {
+    for (int c = c_min; c <= c_max; c++) {
+      int i = idx(r, c);
+      if (board[i] == 0) { // add empty squares
+        moves.push_back(i);
+      }
+    }
+  }
+  return moves;
 }
 
 // TODO: keep track of critical squares?
@@ -143,6 +160,16 @@ int Engine_Board::make_move(int r, int c) {
   int res = Board::make_move(r, c);
   if (res < 0)
     return res;
+  update_bounds(r, c);
+  return res;
+}
+
+int Engine_Board::make_move(int i) {
+  int res = Board::make_move(i);
+  if (res < 0)
+    return res;
+  int r = i / size;
+  int c = i % size;
   update_bounds(r, c);
   return res;
 }
