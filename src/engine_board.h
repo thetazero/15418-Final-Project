@@ -16,6 +16,11 @@ struct Piece {
     Piece(char pr, char pc, char p): r(pr), c(pc), player(p) {} 
 };
 
+typedef struct MinimaxResult {
+  int score;
+  int move;
+} MinimaxResult;
+
 class Engine_Board : public Board {
 public:
     Engine_Board(int board_size);
@@ -32,6 +37,12 @@ public:
     int make_move(int r, int c);
     // move at board index i
     int make_move(int i);
+    // undo move at board index i
+    int undo_move(int i);
+    // recomend a move
+    MinimaxResult engine_recomendation();
+    // return if the game is over
+    bool game_over();
 
 protected:
     // bounds of search, give a buffer of 1 row/col on each side where possible
@@ -47,6 +58,9 @@ private:
     int check_5_straight(int r, int c, 
                          int &x_4_count, int &o_4_count, 
                          int &x_3_count, int &o_3_count);
+    
+
+    MinimaxResult minimax(int depth, bool isMax);
 };
 
 #endif

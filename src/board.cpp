@@ -63,9 +63,7 @@ Board::Board(string filename) {
 }
 
 // make move n on board[r,c]
-int Board::make_move(int r, int c) {
-  return make_move(idx(r, c));
-}
+int Board::make_move(int r, int c) { return make_move(idx(r, c)); }
 
 int Board::make_move(int i) {
   if (i < 0 || i >= size * size) {
@@ -76,6 +74,19 @@ int Board::make_move(int i) {
   }
 
   board[i] = turn;
+  turn *= -1;
+  return 0;
+}
+
+int Board::undo_move(int i) {
+  if (i < 0 || i >= size * size) {
+    return -1;
+  }
+  if (board[i] == 0) {
+    return -1;
+  }
+
+  board[i] = 0;
   turn *= -1;
   return 0;
 }
