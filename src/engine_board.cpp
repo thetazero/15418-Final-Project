@@ -1,5 +1,6 @@
 #include "engine_board.h"
 #include <cassert>
+#include <climits>
 
 using namespace std;
 Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
@@ -128,6 +129,7 @@ bool Engine_Board::game_over() {
 }
 
 int Engine_Board::eval() {
+  eval_count++;
   // number of live 4's for x and o
   int x_4_count = 0, o_4_count = 0;
   // number of live 3's for x and o
@@ -154,6 +156,12 @@ int Engine_Board::eval() {
   assert(!(x_4_count > 0 && o_4_count > 0));
 
   // if you have more than 1 live 4, you will win regardless of who's turn
+  // This is false, see:
+  // . x x x x
+  // x . . . .
+  // x o o o o
+  // x o o o o
+  // x . . . .
   if (x_4_count > 1)
     return INEVITABLE_WIN_EVAL;
   if (o_4_count > 1)
@@ -212,9 +220,12 @@ void Engine_Board::print_bounds() {
        << "(" << (int)r_max << ", " << (int)c_max << ")\n";
 }
 
-MinimaxResult Engine_Board::engine_recomendation() {
-  const int depth = 3;
-  return minimax(depth, true);
+MinimaxResult Engine_Board::engine_recomendation(bool use_alpha_beta) {
+  const int depth = 5;
+  if (use_alpha_beta)
+    return minimax_alpha_beta(depth, INT_MIN, INT_MAX, true);
+  else
+    return minimax(depth, true);
 }
 
 MinimaxResult Engine_Board::minimax(int depth, bool isMax) {
@@ -244,6 +255,47 @@ MinimaxResult Engine_Board::minimax(int depth, bool isMax) {
         best_move.move = moves[i];
       }
       undo_move(moves[i]);
+    }
+  }
+  return best_move;
+}
+
+MinimaxResult Engine_Board::minimax_alpha_beta(int depth, bool isMax, int alpha,
+                                               int beta) {
+  if (depth == 0) {
+    return MinimaxResult{eval(), -1};
+  }
+  MinimaxResult best_move;
+  vector<int> moves = get_candidate_moves();
+  if (isMax) {
+    best_move.score = INT_MIN;
+    for (int i = 0; i < moves.size(); i++) {
+      make_move(moves[i]);
+      MinimaxResult res = minimax_alpha_beta(depth - 1, !isMax, alpha, beta);
+      if (res.score > best_move.score) {
+        best_move.score = res.score;
+        best_move.move = moves[i];
+      }
+      alpha = max(alpha, best_move.score);
+      undo_move(moves[i]);
+      if (res.score > beta)
+        break;
+    }
+  } else {
+    best_move.score = INT_MAX;
+    for (int i = 0; i < moves.size(); i++) {
+      make_move(moves[i]);
+      MinimaxResult res = minimax_alpha_beta(depth - 1, !isMax, alpha, beta);
+      if (res.score < best_move.score) {
+        best_move.score = res.score;
+        best_move.move = moves[i];
+      }
+      beta = min(beta, best_move.score);
+      undo_move(moves[i]);
+      // if (beta <= alpha)
+      //   break;
+      if (res.score < alpha)
+        break;
     }
   }
   return best_move;

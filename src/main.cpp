@@ -1,7 +1,8 @@
 #include <cassert>
 #include <iostream>
-#include <string>
 #include <limits>
+#include <string>
+
 
 #include "board.h"
 #include "engine_board.h"
@@ -46,7 +47,7 @@ void test_engine_board() {
 }
 
 void rng_vs_minimax() {
-  const int size = 7;
+  const int size = 13;
   Engine_Board b(size);
   b.print();
   for (int i = 0; i < size * size; i++) {
@@ -56,7 +57,7 @@ void rng_vs_minimax() {
     }
     cout << endl;
     if (i % 2 == 0) {
-      MinimaxResult best_move = b.engine_recomendation();
+      MinimaxResult best_move = b.engine_recomendation(true);
       b.make_move(best_move.move);
       cout << "Best move: " << best_move.move << endl;
       cout << "Best score: " << best_move.score << endl;
@@ -65,6 +66,7 @@ void rng_vs_minimax() {
     }
     b.print();
     if (b.game_over()) {
+      cout << "Number of evals: " << b.eval_count << endl;
       cout << "Game over!\n";
       break;
     }

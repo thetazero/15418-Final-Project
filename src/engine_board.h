@@ -40,9 +40,10 @@ public:
     // undo move at board index i
     int undo_move(int i);
     // recomend a move
-    MinimaxResult engine_recomendation();
+    MinimaxResult engine_recomendation(bool use_alpha_beta);
     // return if the game is over
     bool game_over();
+    int eval_count = 0;
 
 protected:
     // bounds of search, give a buffer of 1 row/col on each side where possible
@@ -61,6 +62,7 @@ private:
     
 
     MinimaxResult minimax(int depth, bool isMax);
+    MinimaxResult minimax_alpha_beta(int depth, bool isMax, int alpha, int beta);
 };
 
 #endif
