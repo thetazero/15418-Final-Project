@@ -47,7 +47,7 @@ void test_engine_board() {
 }
 
 void rng_vs_minimax() {
-  const int size = 13;
+  const int size = 11;
   Engine_Board b(size);
   b.print();
   for (int i = 0; i < size * size; i++) {
@@ -61,6 +61,7 @@ void rng_vs_minimax() {
       b.make_move(best_move.move);
       cout << "Best move: " << best_move.move << endl;
       cout << "Best score: " << best_move.score << endl;
+      cout << "Eval at current position: " << b.empty_eval() << endl;
     } else {
       b.make_move(moves[0]);
     }

@@ -43,6 +43,7 @@ public:
     MinimaxResult engine_recomendation(bool use_alpha_beta);
     // return if the game is over
     bool game_over();
+    int empty_eval();
     int eval_count = 0;
 
 protected:
@@ -63,6 +64,9 @@ private:
 
     MinimaxResult minimax(int depth, bool isMax);
     MinimaxResult minimax_alpha_beta(int depth, bool isMax, int alpha, int beta);
+
+    int line_len(int r, int c, int dr, int dc);
+    int tile_value(int r, int c);
 };
 
 #endif

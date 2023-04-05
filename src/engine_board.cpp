@@ -178,6 +178,96 @@ int Engine_Board::eval() {
   return x_3_count - o_3_count;
 }
 
+int Engine_Board::line_len(int r, int c, int dr, int dc) {
+  assert(board[idx(r, c)] == 0);
+  if (r + dr < r_min || r + dr > r_max || c + dc < c_min || c + dc > c_max)
+    return 0;
+  char prev = board[idx(r + dr, c + dc)];
+  if (prev == 0)
+    return 0;
+  int len = 1;
+  for (int i = 2; i <= 4; i++) {
+    if (r + i * dr < r_min || r + i * dr > r_max || c + i * dc < c_min ||
+        c + i * dc > c_max)
+      break;
+    char cur = board[idx(r + i * dr, c + i * dc)];
+    if (cur == prev) {
+      len++;
+    } else {
+      break;
+    }
+  }
+  if (prev == -1) {
+    return -1 * len;
+  }
+  return len;
+}
+
+int sign(int x) {
+  if (x > 0)
+    return 1;
+  return -1;
+}
+
+int square_magnitude_preserve_sign(int x) { return x * x * sign(x); }
+
+// The value of a xxx.xx / oo.xx / x.oo line
+// Where seg1 is the nubmer of x's and seg2 is the number of o's
+int combined_line_value(int seg1, int seg2) {
+  if (sign(seg1) != sign(seg2)) {
+    return square_magnitude_preserve_sign(seg1) +
+           square_magnitude_preserve_sign(seg2);
+  } else {
+    return square_magnitude_preserve_sign(min(seg1 + seg2, 4));
+  }
+}
+
+int Engine_Board::tile_value(int r, int c) {
+  if (board[idx(r, c)] != 0) {
+    return 0;
+  }
+  int value = 0;
+
+  int left_len = line_len(r, c, 0, -1);
+  int right_len = line_len(r, c, 0, 1);
+  value += combined_line_value(left_len, right_len);
+
+  int up_len = line_len(r, c, -1, 0);
+  int down_len = line_len(r, c, 1, 0);
+  value += combined_line_value(up_len, down_len);
+
+  int up_left_len = line_len(r, c, -1, -1);
+  int down_right_len = line_len(r, c, 1, 1);
+  value += combined_line_value(up_left_len, down_right_len);
+
+  int up_right_len = line_len(r, c, -1, 1);
+  int down_left_len = line_len(r, c, 1, -1);
+  value += combined_line_value(up_right_len, down_left_len);
+
+  return value;
+}
+
+int Engine_Board::empty_eval() {
+  eval_count++;
+  int t;
+  for (int r = r_min; r <= r_max; r++) {
+    for (int c = c_min; c <= c_max; c++) {
+      int winner =
+          check_5_straight(r, c, t,t,t,t);
+      if (winner != 0) {
+        return winner * INT_MAX;
+      }
+    }
+  }
+  int value = 0;
+  for (int r = r_min; r <= r_max; r++) {
+    for (int c = c_min; c <= c_max; c++) {
+      value += tile_value(r, c);
+    }
+  }
+  return value;
+}
+
 // update the list of moves
 int Engine_Board::make_move(int r, int c) {
   int res = Board::make_move(r, c);
@@ -221,7 +311,7 @@ void Engine_Board::print_bounds() {
 }
 
 MinimaxResult Engine_Board::engine_recomendation(bool use_alpha_beta) {
-  const int depth = 5;
+  const int depth = 3;
   if (use_alpha_beta)
     return minimax_alpha_beta(depth, INT_MIN, INT_MAX, true);
   else
@@ -292,8 +382,6 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int depth, bool isMax, int alpha,
       }
       beta = min(beta, best_move.score);
       undo_move(moves[i]);
-      // if (beta <= alpha)
-      //   break;
       if (res.score < alpha)
         break;
     }
