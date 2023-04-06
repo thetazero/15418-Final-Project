@@ -42,8 +42,7 @@ public:
     // recomend a move
     MinimaxResult engine_recomendation(bool use_alpha_beta);
     // return if the game is over
-    bool game_over();
-    int empty_eval();
+    int game_over(int r, int c);
     int eval_count = 0;
 
 protected:
@@ -57,16 +56,17 @@ private:
 
     // check for 5 in a row from (r,c) in rows, cols, diags
     // also check for live 4's and 3's
-    int check_5_straight(int r, int c, 
+    void check_5_straight(int r, int c, 
                          int &x_4_count, int &o_4_count, 
                          int &x_3_count, int &o_3_count);
-    
+
+    void check_direction(int r, int c, int dr, int dc, 
+                         int &count, int &x_3, int &o_3); 
+    void check_special_3(int r, int c, int &x_3_count, int &o_3_count);
+    void check_special(int r, int c, int dr, int dc, int &x_3, int &o_3);   
 
     MinimaxResult minimax(int depth, bool isMax);
     MinimaxResult minimax_alpha_beta(int depth, bool isMax, int alpha, int beta);
-
-    int line_len(int r, int c, int dr, int dc);
-    int tile_value(int r, int c);
 };
 
 #endif

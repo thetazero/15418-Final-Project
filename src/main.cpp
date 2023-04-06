@@ -37,13 +37,12 @@ void load_board_and_move() {
 }
 
 void test_engine_board() {
-  Engine_Board e(5);
+  Engine_Board e(file_name);
   e.print();
   int eval = e.eval();
-  e.make_move(0, 1);
-  e.make_move(0, 2);
+  // e.save_board(file_name);
   cout << "Eval: " << eval << endl;
-  e.print();
+  // e.print();
 }
 
 void rng_vs_minimax() {
@@ -61,12 +60,13 @@ void rng_vs_minimax() {
       b.make_move(best_move.move);
       cout << "Best move: " << best_move.move << endl;
       cout << "Best score: " << best_move.score << endl;
-      cout << "Eval at current position: " << b.empty_eval() << endl;
+      cout << "Eval at current position: " << b.eval() << endl;
     } else {
       b.make_move(moves[0]);
     }
     b.print();
-    if (b.game_over()) {
+    int eval = b.eval();
+    if (eval == 10000 || eval == -10000) {
       cout << "Number of evals: " << b.eval_count << endl;
       cout << "Game over!\n";
       break;
@@ -77,7 +77,7 @@ void rng_vs_minimax() {
 int main() {
   // test_empty_board();
   // load_board_and_move();
-  // test_engine_board();
-  rng_vs_minimax();
+  test_engine_board();
+  // rng_vs_minimax();
   return 0;
 }
