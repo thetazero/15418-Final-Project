@@ -4,6 +4,7 @@
 #include "board.h"
 #include <vector>
 #include <unordered_set>
+#include <utility>
 
 using namespace std;
 
@@ -19,7 +20,7 @@ struct Piece {
 
 typedef struct MinimaxResult {
   int score;
-  int move;
+  vector<pair<int, int>> moves; // store the variation 
 } MinimaxResult;
 
 class Engine_Board : public Board {
@@ -27,7 +28,7 @@ public:
     Engine_Board(int board_size);
     Engine_Board(string filename);
     Engine_Board(Engine_Board &b);
-    
+
     // returns the index of board positions for the moves
     // call make_move(idx) to make one of the moves
     vector<int> get_candidate_moves();

@@ -1,7 +1,9 @@
 #include "engine_board.h"
 #include "timing.h"
 #include <cassert>
+#include <utility>
 #include <climits>
+#include <algorithm>    // std::reverse
 #include <stdio.h>
 
 using namespace std;
@@ -384,62 +386,63 @@ MinimaxResult Engine_Board::engine_recommendation(int depth, bool prune) {
   if (prune) {
     result = minimax_alpha_beta(depth, 0, isMax, INT_MIN, INT_MAX);
   }    
-  else {
-    result = minimax(depth, 0, isMax);
-  }
+  // else {
+  //   result = minimax(depth, 0, isMax);
+  // }
   double elapsed = t.elapsed();
   cout << "Eval Count: " << eval_count  << ", Time: " << elapsed << endl;
+  reverse(result.moves.begin(), result.moves.end()); // moves are stored backwards
   return result;
     
 }
 
-MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
-  if (depth == max_depth) {
-    return MinimaxResult{eval(), -1};
-  }
-  MinimaxResult best_move;
-  vector<int> moves = get_candidate_moves();
-  if (isMax) {
-    best_move.score = -999999;
-    for (int i = 0; i < 3; i++) {
-      make_move(moves[i]);
-      print();
-      if (game_over()) {
-        cout << eval() << endl;
-        return MinimaxResult{eval(), 0};
-      }
-      MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-      if (res.score > best_move.score) {
-        best_move.score = res.score;
-        best_move.move = moves[i];
-      }
-      undo_move(moves[i]);
-    }
-  } else {
-    best_move.score = 999999;
-    for (int i = 0; i < 3; i++) {
-      make_move(moves[i]);
-      print();
-      if (game_over()) {
-        return MinimaxResult{eval(), 0};
-      }
-      MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-      if (res.score < best_move.score) {
-        best_move.score = res.score;
-        best_move.move = moves[i];
-      }
-      undo_move(moves[i]);
-    }
-  }
-  return best_move;
-}
+// MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
+//   if (depth == max_depth) {
+//     return MinimaxResult{eval(), -1};
+//   }
+//   MinimaxResult best_move;
+//   vector<int> moves = get_candidate_moves();
+//   if (isMax) {
+//     best_move.score = -999999;
+//     for (int i = 0; i < 3; i++) {
+//       make_move(moves[i]);
+//       print();
+//       if (game_over()) {
+//         cout << eval() << endl;
+//         return MinimaxResult{eval(), 0};
+//       }
+//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
+//       if (res.score > best_move.score) {
+//         best_move.score = res.score;
+//         best_move.move = moves[i];
+//       }
+//       undo_move(moves[i]);
+//     }
+//   } else {
+//     best_move.score = 999999;
+//     for (int i = 0; i < 3; i++) {
+//       make_move(moves[i]);
+//       print();
+//       if (game_over()) {
+//         return MinimaxResult{eval(), 0};
+//       }
+//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
+//       if (res.score < best_move.score) {
+//         best_move.score = res.score;
+//         best_move.move = moves[i];
+//       }
+//       undo_move(moves[i]);
+//     }
+//   }
+//   return best_move;
+// }
 
 MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth, 
                                                bool isMax, int alpha, int beta) {
   if (depth == max_depth) {
-    // cout << "Depth Reached: " << eval() << endl;
-    return MinimaxResult{eval(), -1};
+    return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
+  
   MinimaxResult best_move;
   int e = eval();
   vector<int> moves = get_candidate_moves();
@@ -454,21 +457,24 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
     if (game_over()) {
       int e = eval();
       undo_move(moves[i]);
-      return MinimaxResult{e, 0};
+      return MinimaxResult{e, vector<pair<int, int>>(1, rc(i))};
     }
 
     MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+    
     if (isMax) {
       if (res.score > best_move.score) {
         best_move.score = res.score;
-        best_move.move = moves[i];
+        best_move.moves = res.moves;
+        best_move.moves.push_back(rc(moves[i]));
       }
       alpha = max(alpha, best_move.score);
     }
     else {
       if (res.score < best_move.score) {
         best_move.score = res.score;
-        best_move.move = moves[i];
+        best_move.moves = res.moves;
+        best_move.moves.push_back(rc(moves[i]));
       }
       beta = min(beta, best_move.score);
     }
