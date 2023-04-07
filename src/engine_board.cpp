@@ -7,6 +7,17 @@
 #include <stdio.h>
 
 using namespace std;
+
+// void print_line(MinimaxResult &line) {
+//   cout << line.score << ": ";
+//   for (auto &move : line.moves) {
+//     int r = move.first;
+//     int c = move.second;
+//     cout << "(" << r << "," << c << ") ";
+//   }
+//   cout << endl;
+// }
+
 Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   r_min = size;
   c_min = size;
@@ -377,68 +388,52 @@ void Engine_Board::print_bounds() {
        << "(" << (int)r_max << ", " << (int)c_max << ")\n";
 }
 
-MinimaxResult Engine_Board::engine_recommendation(int depth, bool prune) {
+// helper functions to sort lines
+bool compare_lines_gt(MinimaxResult &l1, MinimaxResult &l2) {
+  return (l1.score > l2.score) || (l1.score == l2.score && l1.moves.size() < l2.moves.size());
+}
+
+bool compare_lines_lt(MinimaxResult &l1, MinimaxResult &l2) {
+  return (l1.score < l2.score) || (l1.score == l2.score && l1.moves.size() < l2.moves.size());
+}
+
+vector<MinimaxResult> Engine_Board::engine_recommendation(int depth, int num_lines, 
+                                                          bool prune) {
   eval_count = 0;
   MinimaxResult result;
   Timer t;
   bool isMax = turn == 1;
-  vector<vector<int>> lines;
+  vector<MinimaxResult> lines;
   if (prune) {
-    result = minimax_alpha_beta(depth, 0, isMax, INT_MIN, INT_MAX);
+    result = minimax_alpha_beta(depth, 0, lines, isMax, INT_MIN, INT_MAX);
   }    
   // else {
   //   result = minimax(depth, 0, isMax);
   // }
+  // cout << result.score << ": ";
+  // for (auto &move : result.moves) {
+  //   int r = move.first;
+  //   int c = move.second;
+  //   cout << "(" << r << "," << c << ") ";
+  // }
+  cout << endl;
   double elapsed = t.elapsed();
   cout << "Eval Count: " << eval_count  << ", Time: " << elapsed << endl;
-  reverse(result.moves.begin(), result.moves.end()); // moves are stored backwards
-  return result;
-    
+
+  // sort lines in order of evaluation, and keep only top lines
+  if (turn == 1) sort(lines.begin(), lines.end(), compare_lines_gt);
+  else           sort(lines.begin(), lines.end(), compare_lines_lt);
+  lines.resize(num_lines);
+
+  for (int i = 0; i < lines.size(); i++) {
+    auto &line = lines[i];
+    reverse(line.moves.begin(), line.moves.end()); // moves are stored backwards
+  }
+  
+  return lines;   
 }
 
-// MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
-//   if (depth == max_depth) {
-//     return MinimaxResult{eval(), -1};
-//   }
-//   MinimaxResult best_move;
-//   vector<int> moves = get_candidate_moves();
-//   if (isMax) {
-//     best_move.score = -999999;
-//     for (int i = 0; i < 3; i++) {
-//       make_move(moves[i]);
-//       print();
-//       if (game_over()) {
-//         cout << eval() << endl;
-//         return MinimaxResult{eval(), 0};
-//       }
-//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-//       if (res.score > best_move.score) {
-//         best_move.score = res.score;
-//         best_move.move = moves[i];
-//       }
-//       undo_move(moves[i]);
-//     }
-//   } else {
-//     best_move.score = 999999;
-//     for (int i = 0; i < 3; i++) {
-//       make_move(moves[i]);
-//       print();
-//       if (game_over()) {
-//         return MinimaxResult{eval(), 0};
-//       }
-//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-//       if (res.score < best_move.score) {
-//         best_move.score = res.score;
-//         best_move.move = moves[i];
-//       }
-//       undo_move(moves[i]);
-//     }
-//   }
-//   return best_move;
-// }
-
-MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth, 
-                                               bool isMax, int alpha, int beta) {
+MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
   if (depth == max_depth) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
@@ -460,7 +455,7 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(i))};
     }
 
-    MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+    MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
     
     if (isMax) {
       if (res.score > best_move.score) {
@@ -468,13 +463,73 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
         best_move.moves = res.moves;
         best_move.moves.push_back(rc(moves[i]));
       }
-      alpha = max(alpha, best_move.score);
     }
     else {
       if (res.score < best_move.score) {
         best_move.score = res.score;
         best_move.moves = res.moves;
         best_move.moves.push_back(rc(moves[i]));
+      }
+    }
+
+    undo_move(moves[i]);
+    r_min = old_r_min;
+    c_min = old_c_min;
+    r_max = old_r_max;
+    c_max = old_c_max;
+    
+    if (best_move.score == GAME_OVER_EVAL || best_move.score == -1*GAME_OVER_EVAL) {
+      break;
+    }
+  }
+
+  return best_move;
+}
+
+MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
+                                               vector<MinimaxResult> &lines,
+                                               bool isMax, int alpha, int beta) {
+  if (depth == max_depth) {
+    return MinimaxResult{eval(), vector<pair<int, int>>()};
+  }
+
+  MinimaxResult best_move;
+  int e = eval();
+  vector<int> moves = get_candidate_moves();
+  
+  best_move.score = isMax ? INT_MIN : INT_MAX;
+
+  for (int i = 0; i < moves.size(); i++) {
+    char old_r_min = r_min, old_c_min = c_min;
+    char old_r_max = r_max, old_c_max = c_max;
+    make_move(moves[i]);
+    
+    if (game_over()) {
+      int e = eval();
+      undo_move(moves[i]);
+      return MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))};
+    }
+
+    MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, lines, 
+                                           !isMax, alpha, beta);
+    res.moves.push_back(rc(moves[i]));
+
+    // add to set of lines if at root node
+    if (depth == 0) {
+      lines.push_back(res);
+    }
+
+    if (isMax) {
+      if (res.score > best_move.score) {
+        best_move.score = res.score;
+        best_move.moves = res.moves;
+      }
+      alpha = max(alpha, best_move.score);
+    }
+    else {
+      if (res.score < best_move.score) {
+        best_move.score = res.score;
+        best_move.moves = res.moves;
       }
       beta = min(beta, best_move.score);
     }
@@ -485,9 +540,9 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
     r_max = old_r_max;
     c_max = old_c_max;
     
-    if (alpha == GAME_OVER_EVAL || beta == -1*GAME_OVER_EVAL || beta <= alpha)
+    if (/*alpha == GAME_OVER_EVAL || beta == -1*GAME_OVER_EVAL || */beta <= alpha)
       break;
   }
-
+  
   return best_move;
 }

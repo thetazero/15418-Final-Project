@@ -23,6 +23,12 @@ typedef struct MinimaxResult {
   vector<pair<int, int>> moves; // store the variation 
 } MinimaxResult;
 
+// void print_lines(vector<MinimaxResult> &lines) {
+//   for (auto &line : lines) {
+//     print_line(line);
+//   }
+// }
+
 class Engine_Board : public Board {
 public:
     Engine_Board(int board_size);
@@ -44,7 +50,7 @@ public:
     int undo_move(int i);
     int game_over();
     // recomend a move after searching for max_depth of depth
-    MinimaxResult engine_recommendation(int depth, bool prune);
+    vector<MinimaxResult> engine_recommendation(int depth, int num_lines, bool prune);
     
     int eval_count = 0;
 
@@ -73,7 +79,9 @@ private:
     void check_special(int r, int c, int dr, int dc, int &x_3, int &o_3);   
 
     MinimaxResult minimax(int max_depth, int depth, bool isMax);
-    MinimaxResult minimax_alpha_beta(int max_depth, int depth, bool isMax, int alpha, int beta);
+    MinimaxResult minimax_alpha_beta(int max_depth, int depth, 
+                                     vector<MinimaxResult> &lines,
+                                     bool isMax, int alpha, int beta);
 };
 
 #endif

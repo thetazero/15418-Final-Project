@@ -40,6 +40,7 @@ public:
   // copy constructor
   Board(Board &b);
 
+  int get_turn() { return turn; }
   // make move for whoever's turn is up on board[r,c]
   virtual int make_move(int r, int c);
   virtual int make_move(int i);

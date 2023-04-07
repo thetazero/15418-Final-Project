@@ -77,6 +77,17 @@ void test_engine_board() {
 //   b.save_board(file_name);
 // }
 
+
+void print_line(MinimaxResult &line) {
+  cout << line.score << ": ";
+  for (auto &move : line.moves) {
+    int r = move.first;
+    int c = move.second;
+    cout << "(" << r << "," << c << ") ";
+  }
+  cout << endl;
+}
+
 void search_position() {
   Engine_Board b(file_name);
   cout << "Current Eval: " << b.eval() << endl;
@@ -87,20 +98,13 @@ void search_position() {
   cout << endl;
   for (int d = 1; d <= 7; d++) {
     Engine_Board b_tmp(b);
-    MinimaxResult best_move = b.engine_recommendation(d, true);
-    cout << "Depth: " << d << endl;
-    for (auto &move : best_move.moves) {
-      int r = move.first;
-      int c = move.second;
-      cout << "(" << r << "," << c << ")" << endl;
-      b_tmp.make_move(r, c);
-      b_tmp.print();
+    vector<MinimaxResult> lines = b.engine_recommendation(d, 3, true);
+    cout << "Depth: " << d  << ", Turn: " << (b.get_turn() == 1 ? "x" : "o") << endl;
+    for (auto &line : lines) {
+      print_line(line);
     }
     cout << endl;
-    cout << "Best score: " << best_move.score << endl;
-    cout << "Eval at current position: " << b.eval() << endl; 
-    int r = best_move.moves[0].first, c = best_move.moves[0].second; 
-    
+    cout << "Eval at current position: " << b.eval() << endl;     
   }
     
   // b.make_move(r, c);
