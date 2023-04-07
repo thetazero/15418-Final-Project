@@ -35,7 +35,9 @@ And the picture below's center tile is a (4,2).
 ![(4,2) board](/images/4_2_board.png){:class="img-responsive"}
 
 We then create a custom function
+
 $$ e(x,o) = ???$$
+
 which evaluates an empty tile given the max number of connected x's and o's.
 
 We then sum over the values of all the empty tiles to get the final evaluation function.
