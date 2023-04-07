@@ -36,6 +36,9 @@ public:
   // initialize a board from a file
   Board(string filename);
 
+  // copy constructor
+  Board(Board &b);
+
   // make move for whoever's turn is up on board[r,c]
   virtual int make_move(int r, int c);
   virtual int make_move(int i);

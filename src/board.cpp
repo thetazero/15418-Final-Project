@@ -62,6 +62,14 @@ Board::Board(string filename) {
   board_file.close();
 }
 
+Board::Board(Board &b) {
+  size = b.size;
+  turn = b.turn;
+  int total = size * size;
+  board = new char[total];
+  memcpy(board, b.board, total);
+}
+
 // make move n on board[r,c]
 int Board::make_move(int r, int c) { return make_move(idx(r, c)); }
 

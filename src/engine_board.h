@@ -26,6 +26,7 @@ class Engine_Board : public Board {
 public:
     Engine_Board(int board_size);
     Engine_Board(string filename);
+    Engine_Board(Engine_Board &b);
     
     // returns the index of board positions for the moves
     // call make_move(idx) to make one of the moves

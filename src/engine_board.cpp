@@ -27,6 +27,15 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
   }
 }
 
+Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
+  r_min = b.r_min;
+  c_min = b.c_min;
+  r_max = b.r_max;
+  c_max = b.c_max;
+  critical_4 = b.critical_4;
+  critical_3 = b.critical_3;
+}
+
 vector<int> Engine_Board::get_candidate_moves() {
   // most basic: return vector of empty spots within the search space
   // smarter: first keep track of forced move squares (e.g. to stop live 4's and

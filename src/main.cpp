@@ -86,14 +86,21 @@ void search_position() {
     cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
   }
   cout << endl;
-  MinimaxResult best_move = b.engine_recommendation(7, true);
-  int r = best_move.move / b.get_size();
-  int c = best_move.move % b.get_size();
-  cout << "Best move: (" << r << "," << c << ")" << endl;
-  cout << "Best score: " << best_move.score << endl;
-  cout << "Eval at current position: " << b.eval() << endl;    
-  b.make_move(r, c);
-  b.print();
+  for (int d = 1; d <= 7; d++) {
+    Engine_Board b_tmp(b);
+    MinimaxResult best_move = b.engine_recommendation(d, true);
+    int r = best_move.move / b.get_size();
+    int c = best_move.move % b.get_size();
+    cout << "Depth: " << d << endl;
+    cout << "Best move: (" << r << "," << c << ")" << endl;
+    cout << "Best score: " << best_move.score << endl;
+    cout << "Eval at current position: " << b.eval() << endl;  
+    b_tmp.make_move(r, c);
+    b_tmp.print();
+  }
+    
+  // b.make_move(r, c);
+  // b.print();
 }
 int main() {
   // test_empty_board();
