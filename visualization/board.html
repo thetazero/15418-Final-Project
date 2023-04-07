@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Board Visualization</title>
+  <style>
+    :root {
+      --my-white: hsl(0, 0%, 95%);
+      --my-grey: hsl(0, 0%, 70%);
+      --my-black: hsl(0, 0%, 5%);
+      --my-red: hsl(0, 70%, 70%);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-weight: 100;
+    }
+
+    .tile {
+      width: var(--tile-size);
+      height: var(--tile-size);
+      border: 2px solid var(--my-black);
+      display: inline-block;
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+      background-color: var(--my-white);
+      line-height: calc(var(--tile-size));
+      font-size: calc(var(--tile-size));
+      vertical-align: middle;
+    }
+
+    .tile.x,
+    .tile.o {
+      background-color: var(--my-grey);
+    }
+
+    .tile.x::before {
+      content: "X";
+    }
+
+    .tile.o::before {
+      content: "O";
+    }
+
+    .tile.red{
+      background-color: var(--my-red);
+    }
+
+    #tile-holder {
+      height: 80vh;
+      width: 80vh;
+      display: inline-block;
+      text-align: center;
+      line-height: 0;
+      border: 2px solid var(--my-black);
+    }
+
+    .center {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <b>size: </b><input type="text" name="" id="size_input" value="5">
+  <input type="button" value="make board" onclick="make_board()">
+  <br>
+  <br>
+  <br>
+  <div class="center">
+    <div id="tile-holder">
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+      <div class="tile"></div>
+    </div>
+  </div>
+  <script>
+    const size_input = document.getElementById('size_input');
+    const tile_holder = document.getElementById('tile-holder');
+    function toggle_bg_color(e) {
+      if (e.shiftKey) {
+        if (this.classList.contains('red')) {
+          this.classList.remove('red');
+        } else {
+          this.classList.add('red');
+        }
+      } else {
+        if (this.classList.contains('x')) {
+          this.classList.remove('x');
+          this.classList.add('o');
+        } else if (this.classList.contains('o')) {
+          this.classList.remove('o');
+        } else {
+          this.classList.add('x');
+        }
+      }
+    }
+    function make_board() {
+      const size = parseInt(size_input.value);
+      if (size <= 0) {
+        alert('size must be positive');
+        return;
+      }
+      while (tile_holder.firstChild) {
+        tile_holder.removeChild(tile_holder.firstChild);
+      }
+      for (let i = 0; i < size * size; i++) {
+        let newDiv = document.createElement('div')
+        newDiv.classList.add('tile');
+        newDiv.onclick = toggle_bg_color;
+        tile_holder.appendChild(newDiv);
+      }
+      tile_holder.style.setProperty('--tile-size', `calc(80vh/${size})`);
+    }
+    make_board()
+  </script>
+</body>
+
+</html>
