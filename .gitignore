@@ -1,3 +1,13 @@
 Gemfile.lock
 _site
 connect5
+CMakeFiles
+_deps
+build/*
+CMakeCache.txt
+boards/*
+*Makefile*
+*\.cmake
+src/Connect5_run
+src/libConnect5_lib.a
+test/Connect5_test
