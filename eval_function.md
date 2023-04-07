@@ -9,10 +9,9 @@ permalink: /eval_function/
 While an obvious aproach is to count the numbers of 4 in a row, 3 in a row, 2, in a row, etc...
 This does not work for various reasons, for example the following board has 4 in a row, but it doesn't matter because the tiles are no longer live.
 ![4 in a row doesn't matter](/images/4_in_a_row_doesnt_matter.png){:class="img-responsive"}
-Another issue is that this may lead to double counting
-![4 in a row double counted](/images/4_in_a_row_double_count.png){:class="img-responsive"}
-
+Another issue is that this may lead to double counting.
 While there are 2 distinct 4 in a rows, in effect there is only one, as completing one will complete the other.
+![4 in a row double counted](/images/4_in_a_row_double_count.png){:class="img-responsive"}
 
 Thus we instead focus primarily on the value of empty tiles.
 
@@ -26,7 +25,7 @@ The board below seems complicated, but the only tiles that actually matter are m
 All the gray tiles are irrelevant, as there is a bigger line that will be completed if the center tile is placed.
 ![reduction in cases](/images/reduction_in_cases.png){:class="img-responsive"}
 
-This means we can evaluate each empty treat an empty tile as:
+This means we can evaluate each empty tile as:
 The max number of connected x's and the max number of connected o's.
 So our previous picture's center tile is (2,2).
 And the picture below's center tile is a (4,2).
