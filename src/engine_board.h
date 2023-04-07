@@ -3,6 +3,7 @@
 
 #include "board.h"
 #include <vector>
+#include <unordered_set>
 
 using namespace std;
 
@@ -39,10 +40,10 @@ public:
     int make_move(int i);
     // undo move at board index i
     int undo_move(int i);
-    // recomend a move
-    MinimaxResult engine_recomendation(bool use_alpha_beta);
-    // return if the game is over
-    int game_over(int r, int c);
+    int game_over();
+    // recomend a move after searching for max_depth of depth
+    MinimaxResult engine_recommendation(int depth, bool prune);
+    
     int eval_count = 0;
 
 protected:
@@ -51,9 +52,13 @@ protected:
     char r_min, c_min, r_max, c_max; 
 
 private:
+    // track critical squares
+    unordered_set<int> critical_4, critical_3;
+
     void update_bounds(int r, int c);
     void print_bounds();
-
+    
+    int game_over(int r, int c);
     // check for 5 in a row from (r,c) in rows, cols, diags
     // also check for live 4's and 3's
     void check_5_straight(int r, int c, 
@@ -65,8 +70,8 @@ private:
     void check_special_3(int r, int c, int &x_3_count, int &o_3_count);
     void check_special(int r, int c, int dr, int dc, int &x_3, int &o_3);   
 
-    MinimaxResult minimax(int depth, bool isMax);
-    MinimaxResult minimax_alpha_beta(int depth, bool isMax, int alpha, int beta);
+    MinimaxResult minimax(int max_depth, int depth, bool isMax);
+    MinimaxResult minimax_alpha_beta(int max_depth, int depth, bool isMax, int alpha, int beta);
 };
 
 #endif

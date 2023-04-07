@@ -46,21 +46,24 @@ void test_engine_board() {
 }
 
 void rng_vs_minimax() {
-  const int size = 11;
+  const int size = 19;
   Engine_Board b(size);
   b.print();
   for (int i = 0; i < size * size; i++) {
     auto moves = b.get_candidate_moves();
-    for (auto &m : moves) {
-      cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
-    }
-    cout << endl;
+    // for (auto &m : moves) {
+    //   cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
+    // }
+    // cout << endl;
     if (i % 2 == 0) {
-      MinimaxResult best_move = b.engine_recomendation(true);
-      b.make_move(best_move.move);
-      cout << "Best move: " << best_move.move << endl;
+      MinimaxResult best_move = b.engine_recommendation(3, true);
+      int r = best_move.move / b.get_size();
+      int c = best_move.move % b.get_size();
+      cout << "Best move: (" << r << "," << c << ")" << endl;
       cout << "Best score: " << best_move.score << endl;
       cout << "Eval at current position: " << b.eval() << endl;
+      b.make_move(best_move.move);
+      
     } else {
       b.make_move(moves[0]);
     }
@@ -74,10 +77,29 @@ void rng_vs_minimax() {
   }
   b.save_board(file_name);
 }
+
+void search_position() {
+  Engine_Board b(file_name);
+  cout << "Current Eval: " << b.eval() << endl;
+  auto moves = b.get_candidate_moves();
+  for (auto &m : moves) {
+    cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
+  }
+  cout << endl;
+  MinimaxResult best_move = b.engine_recommendation(7, true);
+  int r = best_move.move / b.get_size();
+  int c = best_move.move % b.get_size();
+  cout << "Best move: (" << r << "," << c << ")" << endl;
+  cout << "Best score: " << best_move.score << endl;
+  cout << "Eval at current position: " << b.eval() << endl;    
+  b.make_move(r, c);
+  b.print();
+}
 int main() {
   // test_empty_board();
   // load_board_and_move();
-  test_engine_board();
+  // test_engine_board();
   // rng_vs_minimax();
+  search_position();
   return 0;
 }
