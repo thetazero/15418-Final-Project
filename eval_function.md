@@ -6,7 +6,7 @@ permalink: /eval_function/
 <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
 
 
-# Empty tiles matter, not the number of connected tiles
+## Empty tiles matter, not the number of connected tiles
 
 While an obvious aproach is to count the numbers of 4 in a row, 3 in a row, 2, in a row, etc...
 This does not work for various reasons, for example the following board has 4 in a row, but it doesn't matter because the tiles are no longer live.
@@ -17,7 +17,7 @@ While there are 2 distinct 4 in a rows, in effect there is only one, as completi
 
 Thus we instead focus primarily on the value of empty tiles.
 
-# Evaluating empty tiles
+## Evaluating empty tiles
 
 From each empty tile there are 8 potential directions to evaluate in (4 cardinal directions, and 4 diagonal directions).
 ![8 directions](/images/potential_eval_directions.png){:class="img-responsive"}
@@ -42,11 +42,11 @@ which evaluates an empty tile given the max number of connected x's and o's.
 
 We then sum over the values of all the empty tiles to get the final evaluation function.
 
-# Special cases
+## Special cases
 
 However, we do include some special cases, to account for clearly winning/losing positions.
 
-## Double 4's
+### Double 4's
 Two double fours connected to distinct empty tiles are a win as seen below.
 No matter what O plays, X will win.
 ![double 4's](/images/double_4_win.png){:class="img-responsive"}
