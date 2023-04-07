@@ -3,6 +3,8 @@ layout: page
 title: Evaluation Function
 permalink: /eval_function/
 ---
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
 
 # Empty tiles matter, not the number of connected tiles
 
