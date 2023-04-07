@@ -380,6 +380,7 @@ MinimaxResult Engine_Board::engine_recommendation(int depth, bool prune) {
   MinimaxResult result;
   Timer t;
   bool isMax = turn == 1;
+  vector<vector<int>> lines;
   if (prune) {
     result = minimax_alpha_beta(depth, 0, isMax, INT_MIN, INT_MAX);
   }    
@@ -443,73 +444,44 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
   int e = eval();
   vector<int> moves = get_candidate_moves();
   
-  if (isMax) {
-    best_move.score = INT_MIN;
-    for (int i = 0; i < moves.size(); i++) {
-      char old_r_min = r_min, old_c_min = c_min;
-      char old_r_max = r_max, old_c_max = c_max;
-      make_move(moves[i]);
-      // int r = moves[i] / size, c = moves[i] % size;
-      // cout << "Move: (" << r << "," << c << ") Depth: " << depth << endl;
-      // print();
-      if (game_over()) {
-        int e = eval();
-        // cout << "Max Game Over: " << e << endl;
-        undo_move(moves[i]);
-        return MinimaxResult{e, 0};
-      }
-      MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+  best_move.score = isMax ? INT_MIN : INT_MAX;
+
+  for (int i = 0; i < moves.size(); i++) {
+    char old_r_min = r_min, old_c_min = c_min;
+    char old_r_max = r_max, old_c_max = c_max;
+    make_move(moves[i]);
+    
+    if (game_over()) {
+      int e = eval();
+      undo_move(moves[i]);
+      return MinimaxResult{e, 0};
+    }
+
+    MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+    if (isMax) {
       if (res.score > best_move.score) {
         best_move.score = res.score;
         best_move.move = moves[i];
       }
       alpha = max(alpha, best_move.score);
-      undo_move(moves[i]);
-      r_min = old_r_min;
-      c_min = old_c_min;
-      r_max = old_r_max;
-      c_max = old_c_max;
-
-      if (alpha == GAME_OVER_EVAL || alpha >= beta) {
-        // cout << "beta: " << beta << " alpha: " << alpha << endl;
-        break;
-      }
-      
     }
-  } else {
-    best_move.score = INT_MAX;
-    for (int i = 0; i < moves.size(); i++) {
-      // save old bounds to be reset
-      char old_r_min = r_min, old_c_min = c_min;
-      char old_r_max = r_max, old_c_max = c_max;
-      make_move(moves[i]);
-      // int r = moves[i] / size, c = moves[i] % size;
-      // cout << "Move: (" << r << "," << c << ") Depth: " << depth << endl;
-      // print();
-      if (game_over()) {
-        int e = eval();
-        // cout << "Min Game Over: " << e << endl;
-        undo_move(moves[i]);
-        r_min = old_r_min;
-        c_min = old_c_min;
-        r_max = old_r_max;
-        c_max = old_c_max;
-        return MinimaxResult{e, 0};
-      }
-      MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+    else {
       if (res.score < best_move.score) {
         best_move.score = res.score;
         best_move.move = moves[i];
       }
       beta = min(beta, best_move.score);
-      undo_move(moves[i]);
-      r_min = old_r_min;
-      c_min = old_c_min;
-      r_max = old_r_max;
-      c_max = old_c_max;
-      if (beta == -1*GAME_OVER_EVAL || beta <= alpha)
-        break;
     }
+
+    undo_move(moves[i]);
+    r_min = old_r_min;
+    c_min = old_c_min;
+    r_max = old_r_max;
+    c_max = old_c_max;
+    
+    if (alpha == GAME_OVER_EVAL || beta == -1*GAME_OVER_EVAL || beta <= alpha)
+      break;
   }
+
   return best_move;
 }
