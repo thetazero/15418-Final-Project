@@ -5,6 +5,7 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <utility>
 
 using namespace std;
 
@@ -61,6 +62,7 @@ protected:
   char turn;
 
   inline int idx(int r, int c) { return r * size + c; }
+  inline pair<int, int> rc(int i) { return make_pair(i / size, i % size); }
 
 };
 #endif
