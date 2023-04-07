@@ -37,6 +37,8 @@ We then create a custom function
 $$ e(x,o) = ???$$
 which evaluates an empty tile given the max number of connected x's and o's.
 
+We then sum over the values of all the empty tiles to get the final evaluation function.
+
 # Special cases
 
 However, we do include some special cases, to account for clearly winning/losing positions.
