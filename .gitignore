@@ -10,3 +10,4 @@ boards/*
 *\.cmake
 src/Connect5_run
 src/libConnect5_lib.a
+test/Connect5_test
