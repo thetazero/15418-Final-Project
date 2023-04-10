@@ -111,6 +111,17 @@ int main() {
   // load_board_and_move();
   // test_engine_board();
   // rng_vs_minimax();
-  search_position();
+  // search_position();
+  string b2 = R"(
+  .o.....
+  ..xxx..
+  ..x.o.x
+  ..oxo..
+  ..x.xo.
+  ..o..o.
+  ..xxx..
+  )";
+  Engine_Board board2(b2, 'x', 7);
+  
   return 0;
 }

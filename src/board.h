@@ -37,6 +37,9 @@ public:
   // initialize a board from a file
   Board(string filename);
 
+  // Initialize board from board state string, turn char, and size int
+  Board(string board_state, char board_turn, int board_size);
+
   // copy constructor
   Board(Board &b);
 
@@ -50,16 +53,19 @@ public:
 
   // print the board to console
   void print();
+
+  // convert board to string
+  string to_string();
   
   // get board size
   int get_size();
 
   ~Board();
+  int turn;
 
 protected:
   char *board;
   int size;
-  char turn;
 
   inline int idx(int r, int c) { return r * size + c; }
   inline pair<int, int> rc(int i) { return make_pair(i / size, i % size); }
