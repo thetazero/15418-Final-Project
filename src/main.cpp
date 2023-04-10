@@ -62,7 +62,7 @@ void test_engine_board() {
 //       cout << "Best score: " << best_move.score << endl;
 //       cout << "Eval at current position: " << b.eval() << endl;
 //       b.make_move(best_move.move);
-      
+
 //     } else {
 //       b.make_move(moves[0]);
 //     }
@@ -76,7 +76,6 @@ void test_engine_board() {
 //   }
 //   b.save_board(file_name);
 // }
-
 
 void print_line(MinimaxResult &line) {
   cout << line.score << ": ";
@@ -99,22 +98,23 @@ void search_position() {
   for (int d = 1; d <= 7; d++) {
     Engine_Board b_tmp(b);
     vector<MinimaxResult> lines = b.engine_recommendation(d, 3, true);
-    cout << "Depth: " << d  << ", Turn: " << (b.get_turn() == 1 ? "x" : "o") << endl;
+    cout << "Depth: " << d << ", Turn: " << (b.get_turn() == 1 ? "x" : "o")
+         << endl;
     for (auto &line : lines) {
       print_line(line);
     }
     cout << endl;
-    cout << "Eval at current position: " << b.eval() << endl;     
+    cout << "Eval at current position: " << b.eval() << endl;
   }
-    
+
   // b.make_move(r, c);
   // b.print();
 }
 int main() {
   // test_empty_board();
   // load_board_and_move();
-  // test_engine_board();
+  test_engine_board();
   // rng_vs_minimax();
-  search_position();
+  // search_position();
   return 0;
 }

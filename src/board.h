@@ -1,28 +1,28 @@
 #ifndef BOARD_H
 #define BOARD_H
 
-#include <fstream>
-#include <string>
-#include <iostream>
 #include <cstring>
+#include <fstream>
+#include <iostream>
+#include <string>
 #include <utility>
 
 using namespace std;
 
 /* Board Details:
-Boards are square, size x size 
+Boards are square, size x size
 There are 2 players: x and o. Empty position is represented by a .
 Each position at a board is either:
 x - represented by 1 in our array
 o - represented by -1 in our array
-. - represented by 0 in our array 
+. - represented by 0 in our array
 
 In board files, the format is:
 - first line is the size
 - second line is the who's turn
 - followed by a space-separated grid of the board
 E.g.
-3 
+3
 x
 . x o
 x o .
@@ -51,7 +51,7 @@ public:
 
   // print the board to console
   void print();
-  
+
   // get board size
   int get_size();
 
@@ -64,6 +64,5 @@ protected:
 
   inline int idx(int r, int c) { return r * size + c; }
   inline pair<int, int> rc(int i) { return make_pair(i / size, i % size); }
-
 };
 #endif
