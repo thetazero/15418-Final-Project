@@ -1,10 +1,10 @@
 #include "engine_board.h"
 #include "timing.h"
+#include <algorithm> // std::reverse
 #include <cassert>
-#include <utility>
 #include <climits>
-#include <algorithm>    // std::reverse
 #include <stdio.h>
+#include <utility>
 
 using namespace std;
 Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
@@ -15,6 +15,22 @@ Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
 }
 
 Engine_Board::Engine_Board(string filename) : Board(filename) {
+  r_min = size;
+  c_min = size;
+  r_max = -1;
+  c_max = -1;
+  // establish bounds of pieces
+  for (int r = 0; r < size; r++) {
+    for (int c = 0; c < size; c++) {
+      if (board[idx(r, c)] != 0) {
+        update_bounds(r, c);
+      }
+    }
+  }
+}
+
+Engine_Board::Engine_Board(string board_state, char board_turn, int board_size)
+    : Board(board_state, board_turn, board_size) {
   r_min = size;
   c_min = size;
   r_max = -1;
@@ -59,12 +75,12 @@ vector<int> Engine_Board::get_candidate_moves() {
     if (!board[i])
       moves.push_back(i);
   }
-  
+
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       int i = idx(r, c);
       // add empty squares that haven't already been added
-      if (board[i] == 0 && !critical_4.count(i) && !critical_3.count(i)) { 
+      if (board[i] == 0 && !critical_4.count(i) && !critical_3.count(i)) {
         moves.push_back(i);
       }
     }
@@ -72,14 +88,16 @@ vector<int> Engine_Board::get_candidate_moves() {
   return moves;
 }
 
-void Engine_Board::check_direction(int r, int c, int dr, int dc, 
-                                   int &count, int &x_3, int &o_3) {
-  count = (board[idx(r + 1*dr, c + 1*dc)] + board[idx(r + 2*dr, c + 2*dc)] + 
-           board[idx(r + 3*dr, c + 3*dc)] + board[idx(r + 4*dr, c + 4*dc)]);
-  int empty_edge = board[idx(r + 4*dr, c + 4*dc)] == 0;
+void Engine_Board::check_direction(int r, int c, int dr, int dc, int &count,
+                                   int &x_3, int &o_3) {
+  count =
+      (board[idx(r + 1 * dr, c + 1 * dc)] + board[idx(r + 2 * dr, c + 2 * dc)] +
+       board[idx(r + 3 * dr, c + 3 * dc)] + board[idx(r + 4 * dr, c + 4 * dc)]);
+  int empty_edge = board[idx(r + 4 * dr, c + 4 * dc)] == 0;
   x_3 = empty_edge && (count == 3);
   o_3 = empty_edge && (count == -3);
-  // printf("(%d, %d) (%d, %d): count: %d, (%d, %d)\n", r, c, dr, dc, count, x_3, o_3);
+  // printf("(%d, %d) (%d, %d): count: %d, (%d, %d)\n", r, c, dr, dc, count,
+  // x_3, o_3);
 }
 
 // TODO: keep track of critical squares?
@@ -87,8 +105,9 @@ void Engine_Board::check_direction(int r, int c, int dr, int dc,
 // update counts of live 4's and live 3's for both colors
 // live 4: 4 out of 5 squares are one piece, last square empty
 // live 3: this specific pattern: [. x x x .]
-void Engine_Board::check_5_straight(int r, int c, int &x_4_count, int &o_4_count,
-                                   int &x_3_count, int &o_3_count) {
+void Engine_Board::check_5_straight(int r, int c, int &x_4_count,
+                                    int &o_4_count, int &x_3_count,
+                                    int &o_3_count) {
   int valid_down = (r_max - r >= 4);
   int valid_up = (r - r_min >= 4);
   int valid_right = (c_max - c >= 4);
@@ -100,8 +119,8 @@ void Engine_Board::check_5_straight(int r, int c, int &x_4_count, int &o_4_count
 
   // consecutive counts in each direction
   int down = 0, up = 0, right = 0, left = 0;
-  int down_right = 0, up_left = 0, down_left = 0, up_right = 0; 
-  
+  int down_right = 0, up_left = 0, down_left = 0, up_right = 0;
+
   // track live 3's for x and o
   int down_x_3 = 0, up_x_3 = 0, right_x_3 = 0, left_x_3 = 0;
   int down_right_x_3 = 0, up_left_x_3 = 0, down_left_x_3 = 0, up_right_x_3 = 0;
@@ -133,30 +152,29 @@ void Engine_Board::check_5_straight(int r, int c, int &x_4_count, int &o_4_count
     check_direction(r, c, -1, 1, up_right, up_right_x_3, up_right_o_3);
   }
 
-  int critical_x_4 = (down == 4 || up == 4 || right == 4|| left == 4 ||
-                      down_right == 4 || up_left == 4 || 
-                      down_left == 4 || up_right == 4);
-  int critical_o_4 = (down == -4 || up == -4 || right == -4|| left == -4 ||
-                      down_right == -4 || up_left == -4 || 
-                      down_left == -4 || up_right == -4);
+  int critical_x_4 =
+      (down == 4 || up == 4 || right == 4 || left == 4 || down_right == 4 ||
+       up_left == 4 || down_left == 4 || up_right == 4);
+  int critical_o_4 =
+      (down == -4 || up == -4 || right == -4 || left == -4 ||
+       down_right == -4 || up_left == -4 || down_left == -4 || up_right == -4);
   // add to totals if found a live 3 or 4
   x_4_count += critical_x_4;
   o_4_count += critical_o_4;
 
-  int critical_x_3 = (down_x_3 || up_x_3 || right_x_3 || left_x_3 || 
-                      down_right_x_3 || up_left_x_3 || 
-                      down_left_x_3 || up_right_x_3);
-  int critical_o_3 = (down_o_3 || up_o_3 || right_o_3 || left_o_3 || 
-                      down_right_o_3 || up_left_o_3 || 
-                      down_left_o_3 || up_right_o_3);
+  int critical_x_3 =
+      (down_x_3 || up_x_3 || right_x_3 || left_x_3 || down_right_x_3 ||
+       up_left_x_3 || down_left_x_3 || up_right_x_3);
+  int critical_o_3 =
+      (down_o_3 || up_o_3 || right_o_3 || left_o_3 || down_right_o_3 ||
+       up_left_o_3 || down_left_o_3 || up_right_o_3);
   x_3_count += critical_x_3;
   o_3_count += critical_o_3;
 
   // add the the set of highest importance
   if (critical_x_4 || critical_o_4) {
     critical_4.insert(idx(r, c));
-  }
-  else if (critical_x_3 || critical_o_3){
+  } else if (critical_x_3 || critical_o_3) {
     critical_3.insert(idx(r, c));
   }
 }
@@ -198,7 +216,8 @@ int Engine_Board::game_over(int r, int c) {
   return 0;
 }
 
-void Engine_Board::check_special_3(int r, int c, int &x_3_count, int &o_3_count) {
+void Engine_Board::check_special_3(int r, int c, int &x_3_count,
+                                   int &o_3_count) {
   int valid_up = (r_max - r >= 2) && (r - r_min >= 3);
   int valid_down = (r_max - r >= 3) && (r - r_min >= 2);
   int valid_left = (c_max - c >= 2) && (c - c_min >= 3);
@@ -238,10 +257,10 @@ void Engine_Board::check_special_3(int r, int c, int &x_3_count, int &o_3_count)
     check_special(r, c, -1, -1, up_left_x, up_left_o);
   }
 
-  int critical_x_3 = (up_x || down_x || right_x || left_x || 
-                      down_left_x || up_right_x || down_right_x || up_left_x);
-  int critical_o_3 = (up_o || down_o || right_o || left_o || 
-                      down_left_o || up_right_o || down_right_o || up_left_o);
+  int critical_x_3 = (up_x || down_x || right_x || left_x || down_left_x ||
+                      up_right_x || down_right_x || up_left_x);
+  int critical_o_3 = (up_o || down_o || right_o || left_o || down_left_o ||
+                      up_right_o || down_right_o || up_left_o);
   x_3_count += critical_x_3;
   o_3_count += critical_o_3;
 
@@ -250,11 +269,13 @@ void Engine_Board::check_special_3(int r, int c, int &x_3_count, int &o_3_count)
   }
 }
 
-void Engine_Board::check_special(int r, int c, int dr, int dc,
-                                 int &x_3, int &o_3) {
-  int sum = (board[idx(r + 1*dr, c + 1*dc)] + board[idx(r + 2*dr, c + 2*dc)] + 
-             board[idx(r - 1*dr, c - 1*dc)]);
-  int open = !board[idx(r - 2*dr, c - 2*dc)] && !board[idx(r + 3*dr, c + 3*dc)];
+void Engine_Board::check_special(int r, int c, int dr, int dc, int &x_3,
+                                 int &o_3) {
+  int sum =
+      (board[idx(r + 1 * dr, c + 1 * dc)] + board[idx(r + 2 * dr, c + 2 * dc)] +
+       board[idx(r - 1 * dr, c - 1 * dc)]);
+  int open = !board[idx(r - 2 * dr, c - 2 * dc)] &&
+             !board[idx(r + 3 * dr, c + 3 * dc)];
   x_3 += (sum == 3) && open;
   o_3 += (sum == -3) && open;
 }
@@ -266,12 +287,72 @@ int Engine_Board::game_over() {
       if (board[idx(r, c)] != 0) {
         int winner = game_over(r, c);
         if (winner != 0) {
-          return 1;
+          return winner;
         }
       }
     }
   }
-  return 0; 
+  return 0;
+}
+
+bool Engine_Board::in_bounds(int r, int c) {
+  return r >= 0 && r < size && c >= 0 && c < size;
+}
+
+int Engine_Board::count_direction(int r, int c, int dr, int dc) {
+  assert(board[idx(r, c)] == 0);
+  int count = 0;
+  int cur = 0;
+  for (int i = 1; i <= 4; i++) {
+    int cr = r + i * dr;
+    int cc = c + i * dc;
+    if (!in_bounds(cr, cc)) {
+      break;
+    }
+    int c = board[idx(cr, cc)];
+    if (c != 0 && (cur == 0 || c == cur)) {
+      count++;
+      cur = c;
+    } else {
+      break;
+    }
+  }
+  return count * cur;
+}
+
+int sign(int x) {
+  if (x >= 0) {
+    return 1;
+  }
+  return 0;
+}
+
+TileSummary Engine_Board::summarize_empty_tile(int r, int c) {
+  TileSummary summary = {0, 0};
+  for (auto [dr, dc] : half_directions) {
+    int count1 = count_direction(r, c, dr, dc);
+    int count2 = count_direction(r, c, -dr, -dc);
+
+    int pos_count, neg_count;
+    if (sign(count1) != sign(count2)) {
+      summary.x = max(summary.x, max(count1, count2));
+      summary.o = max(summary.o, max(-count1, -count2));
+    } else {
+      if (count1 + count2 > 0) {
+        summary.x = max(summary.x, count1 + count2);
+      } else {
+        summary.o = max(summary.o, -count1 - count2);
+      }
+    }
+  }
+  summary.x = min(summary.x, 4);
+  summary.o = min(summary.o, 4);
+  return summary;
+}
+
+int Engine_Board::summary_score(TileSummary ts) {
+  int diff = ts.x - ts.o;
+  return sign(diff) * (diff * diff);
 }
 
 int Engine_Board::eval() {
@@ -285,6 +366,8 @@ int Engine_Board::eval() {
   critical_4.clear();
   critical_3.clear();
 
+  int e_score = 0;
+
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       // check for 5 in a row if square occupied
@@ -293,10 +376,11 @@ int Engine_Board::eval() {
         if (winner != 0) {
           return winner;
         }
-      }
-      else { // check if filling in the spot would form live 4 or 3
+      } else { // check if filling in the spot would form live 4 or 3
         check_5_straight(r, c, x_4_count, o_4_count, x_3_count, o_3_count);
         check_special_3(r, c, x_3_count, o_3_count);
+        TileSummary summary = summarize_empty_tile(r, c);
+        e_score += summary_score(summary);
       }
     }
   }
@@ -327,12 +411,10 @@ int Engine_Board::eval() {
   }
 
   if (x_3_count >= 1 && turn == 1) {
-
   }
   if (o_3_count >= 1 && turn == -1) {
-
   }
-  return x_3_count - o_3_count;
+  return e_score;
 }
 
 // update the list of moves
@@ -385,15 +467,15 @@ MinimaxResult Engine_Board::engine_recommendation(int depth, bool prune) {
   vector<vector<int>> lines;
   if (prune) {
     result = minimax_alpha_beta(depth, 0, isMax, INT_MIN, INT_MAX);
-  }    
+  }
   // else {
   //   result = minimax(depth, 0, isMax);
   // }
   double elapsed = t.elapsed();
-  cout << "Eval Count: " << eval_count  << ", Time: " << elapsed << endl;
-  reverse(result.moves.begin(), result.moves.end()); // moves are stored backwards
+  cout << "Eval Count: " << eval_count << ", Time: " << elapsed << endl;
+  reverse(result.moves.begin(),
+          result.moves.end()); // moves are stored backwards
   return result;
-    
 }
 
 // MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
@@ -437,31 +519,33 @@ MinimaxResult Engine_Board::engine_recommendation(int depth, bool prune) {
 //   return best_move;
 // }
 
-MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth, 
-                                               bool isMax, int alpha, int beta) {
+MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
+                                               bool isMax, int alpha,
+                                               int beta) {
   if (depth == max_depth) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
-  
+
   MinimaxResult best_move;
   int e = eval();
   vector<int> moves = get_candidate_moves();
-  
+
   best_move.score = isMax ? INT_MIN : INT_MAX;
 
   for (int i = 0; i < moves.size(); i++) {
     char old_r_min = r_min, old_c_min = c_min;
     char old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
-    
+
     if (game_over()) {
       int e = eval();
       undo_move(moves[i]);
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(i))};
     }
 
-    MinimaxResult res = minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
-    
+    MinimaxResult res =
+        minimax_alpha_beta(max_depth, depth + 1, !isMax, alpha, beta);
+
     if (isMax) {
       if (res.score > best_move.score) {
         best_move.score = res.score;
@@ -469,8 +553,7 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
         best_move.moves.push_back(rc(moves[i]));
       }
       alpha = max(alpha, best_move.score);
-    }
-    else {
+    } else {
       if (res.score < best_move.score) {
         best_move.score = res.score;
         best_move.moves = res.moves;
@@ -484,8 +567,8 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
     c_min = old_c_min;
     r_max = old_r_max;
     c_max = old_c_max;
-    
-    if (alpha == GAME_OVER_EVAL || beta == -1*GAME_OVER_EVAL || beta <= alpha)
+
+    if (alpha == GAME_OVER_EVAL || beta == -1 * GAME_OVER_EVAL || beta <= alpha)
       break;
   }
 
