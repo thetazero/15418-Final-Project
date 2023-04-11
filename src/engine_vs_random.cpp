@@ -1,47 +1,14 @@
 #include <cassert>
 #include <iostream>
 #include <limits>
+#include <stdlib.h>
 #include <string>
 
-#include "board.h"
-#include "engine_board.h"
-#include "timing.h"
+#include "engine/board.h"
+#include "engine/engine_board.h"
+#include "engine/timing.h"
 
 using namespace std;
-
-void test_empty_board() {
-  Engine_Board b(5);
-  b.print();
-  for (int i = 0; i < 25; i++) {
-    auto moves = b.get_candidate_moves();
-    for (auto &m : moves) {
-      cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
-    }
-    cout << endl;
-    b.make_move(moves[0]);
-    b.print();
-  }
-  b.save_board(file_name);
-}
-
-void load_board_and_move() {
-  Board b(file_name);
-  b.make_move(0, 2);
-  b.print();
-  b.make_move(0, 1);
-  assert(b.make_move(0, 2) < 0);
-  b.print();
-  b.save_board(file_name);
-}
-
-void test_engine_board() {
-  Engine_Board e(file_name);
-  e.print();
-  int eval = e.eval();
-  // e.save_board(file_name);
-  cout << "Eval: " << eval << endl;
-  // e.print();
-}
 
 void print_line(MinimaxResult &line) {
   cout << line.score << ": ";
@@ -63,11 +30,15 @@ void rng_vs_minimax(int depth) {
       for (auto &line : lines) {
         print_line(line);
       }
+      int r = lines[0].moves[0].first;
+      int c = lines[0].moves[0].second;
+      b.make_move(r, c);
       cout << endl;
       cout << "Eval at current position: " << b.eval() << endl;
     } else {
       auto moves = b.get_candidate_moves();
-      b.make_move(moves[0]);
+      int r = rand() % moves.size();
+      b.make_move(moves[r]);
     }
     b.print();
     int eval = b.eval();
@@ -77,7 +48,6 @@ void rng_vs_minimax(int depth) {
       break;
     }
   }
-  b.save_board(file_name);
 }
 
 int main(int argc, char *argv[]) {
@@ -88,9 +58,9 @@ int main(int argc, char *argv[]) {
     depth = atoi(argv[1]);
   } else {
     printf("Usage: ./engine_vs_random <depth>\n");
-    return;
+    return 0;
   }
-  printf("Random Game with Depth %d Engine\n");
+  printf("Random Game with Depth %d Engine\n", depth);
   rng_vs_minimax(depth);
   return 0;
 }

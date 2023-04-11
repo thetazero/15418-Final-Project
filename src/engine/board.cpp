@@ -14,6 +14,7 @@ Board::Board(string filename) {
   board_file.open(filename, fstream::in);
   if (!board_file.is_open()) {
     cout << "Failed to open file: " << filename << endl;
+    return;
   }
 
   string line;

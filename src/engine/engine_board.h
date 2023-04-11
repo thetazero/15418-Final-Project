@@ -66,14 +66,14 @@ private:
   int game_over(int r, int c);
   // check for 5 in a row from (r,c) in rows, cols, diags
   // also check for live 4's and 3's
-  void check_5_straight(int r, int c, int &x_4_count, int &o_4_count,
-                        int &x_3_count, int &o_3_count,
-                        int &special_x_3_count, int &special_o_3_count);
+  int check_5_straight(int r, int c, int &x_4_count, int &o_4_count);
 
   // returns true if the edge is empty, false otherwise
   // empty edge means the last tile that stops a consecutive sequence of
   // the same player's chip is empty and not the opposite player's chip
   bool check_direction(int r, int c, int dr, int dc, int &count);
+
+  int process_counts(int *counts);
 
   MinimaxResult minimax(int max_depth, int depth, bool isMax);
   MinimaxResult minimax_alpha_beta(int max_depth, int depth,

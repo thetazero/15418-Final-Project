@@ -1,15 +1,22 @@
 CFLAGS := -std=c++14 -fvisibility=hidden -lpthread
 
-SOURCES := src/*.cpp
-HEADERS := src/*.h
+SOURCES := src/engine/*.cpp
+HEADERS := src/engine/*.h
 
-TARGETBIN := connect5
-all: $(TARGETBIN)
-$(TARGETBIN): $(SOURCES) $(HEADERS)
-	$(CXX) -o $@ $(CFLAGS) $(SOURCES) 
+TARGETS := run_engine engine_vs_random engine_vs_engine
+all: $(TARGETS)
+
+run_engine: $(HEADERS) $(SOURCES) src/run_engine.cpp
+	$(CXX) -o $@ $(CFLAGS) src/run_engine.cpp $(SOURCES)
+
+engine_vs_random: $(HEADERS) $(SOURCES) src/engine_vs_random.cpp
+	$(CXX) -o $@ $(CFLAGS) src/engine_vs_random.cpp $(SOURCES)
+
+engine_vs_engine: $(HEADERS) $(SOURCES) src/engine_vs_engine.cpp
+	$(CXX) -o $@ $(CFLAGS) src/engine_vs_engine.cpp $(SOURCES)
 
 clean: 
-	rm -rf ./connect5
+	rm -f $(TARGETS)
 
 format:
-	clang-format -i src/*.cpp src/*.h
+	clang-format -i src/engine/*.cpp src/engine/*.h src/*.cpp

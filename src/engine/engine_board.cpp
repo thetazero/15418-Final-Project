@@ -85,7 +85,7 @@ vector<int> Engine_Board::get_candidate_moves() {
 
 bool Engine_Board::check_direction(int r, int c, int dr, int dc, int &count) {
   int start_tile = board[idx(r + dr, c + dc)]; // the first tile in the sequence
-  for (int i= 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++) {
     // move to the next tile in direction
     r += dr;
     c += dc;
@@ -95,7 +95,7 @@ bool Engine_Board::check_direction(int r, int c, int dr, int dc, int &count) {
     }
 
     int tile = board[idx(r, c)];
-  
+
     if (tile == 0) {
       return true;
     }
@@ -108,16 +108,36 @@ bool Engine_Board::check_direction(int r, int c, int dr, int dc, int &count) {
   return false;
 }
 
+int Engine_Board::process_counts(int *counts) {
+  int max_x = 0, max_o = 0;
+  for (int i = 0; i < 4; i++) {
+    int c1 = counts[2 * i];
+    int c2 = counts[2 * i + 1];
+
+    if (c1 < 0 && c2 < 0) {
+      max_o = max(-c1 - c2, max_o);
+    } else if (c1 >= 0 && c2 >= 0) {
+      max_x = max(c1 + c2, max_x);
+    } else {
+      max_x = max(max_x, max(c1, c2));
+      max_o = max(max_o, max(-c1, -c2));
+    }
+  }
+  max_x = min(max_x, 4);
+  max_o = min(max_o, 4);
+
+  int diff = max_x - max_o;
+  int sign = diff < 0 ? -1 : 1;
+  return sign * diff * diff;
+}
+
 // TODO: keep track of critical squares?
 // search 5 straight dots fomr (r, c) down the row, column, and two diagonals
 // update counts of live 4's and live 3's for both colors
 // live 4: 4 out of 5 squares are one piece, last square empty
 // live 3: this specific pattern: [. x x x .]
-void Engine_Board::check_5_straight(int r, int c, 
-                                    int &x_4_count, int &o_4_count, 
-                                    int &x_3_count, int &o_3_count,
-                                    int &special_x_3_count, 
-                                    int &special_o_3_count) {
+int Engine_Board::check_5_straight(int r, int c, int &x_4_count,
+                                   int &o_4_count) {
   // consecutive counts in each direction
   int down = 0, up = 0, right = 0, left = 0;
   int down_right = 0, up_left = 0, down_left = 0, up_right = 0;
@@ -131,72 +151,72 @@ void Engine_Board::check_5_straight(int r, int c,
   bool down_left_open = check_direction(r, c, 1, -1, down_left);
   bool up_right_open = check_direction(r, c, -1, 1, up_right);
 
-  int critical_x_4 = ((down == 4) || (up == 4) || 
-                      (left == 4) || (right == 4) ||
-                      (down_left == 4) || (up_right == 4) || 
-                      (down_right == 4) || (up_left == 4) ||
-                      (down + up >= 4) || (down_right + up_left >= 4) || 
-                      (right + left >= 4) || (down_left + up_right >= 4));
-  int critical_o_4 = ((down == -4) || (up == -4) || 
-                      (left == -4) || (right == -4) ||
-                      (down_left == -4) || (up_right == -4) || 
-                      (down_right == -4) || (up_left == -4) ||
-                      (down + up <= -4) || (down_right + up_left <= -4) || 
-                      (right + left <= -4) || (down_left + up_right <= -4));
+  int critical_x_4 =
+      ((down == 4) || (up == 4) || (left == 4) || (right == 4) ||
+       (down_left == 4) || (up_right == 4) || (down_right == 4) ||
+       (up_left == 4) || (down + up >= 4) || (down_right + up_left >= 4) ||
+       (right + left >= 4) || (down_left + up_right >= 4));
+  int critical_o_4 =
+      ((down == -4) || (up == -4) || (left == -4) || (right == -4) ||
+       (down_left == -4) || (up_right == -4) || (down_right == -4) ||
+       (up_left == -4) || (down + up <= -4) || (down_right + up_left <= -4) ||
+       (right + left <= -4) || (down_left + up_right <= -4));
 
   // add to totals if found a live 3 or 4
   x_4_count += critical_x_4;
   o_4_count += critical_o_4;
 
   // TODO: this stuff is not correct yet, double counting issues
-  int critical_x_3 = ((down == 3 && down_open) || (left == 3 && left_open) ||
-                      (right == 3 && right_open) || (up == 3 && up_open) ||
-                      (down_left == 3 && down_left_open) ||
-                      (down_right == 3 && down_right_open) ||
-                      (up_left == 3 && up_left_open) ||
-                      (up_right == 3 && up_right_open));
-                      
-  int critical_special_x_3 = ((down + up == 3 && down_open && up_open) ||
-                              (left + right == 3 && left_open && right_open) ||
-                              (down_right + up_left == 3 && 
-                               down_right_open && up_left_open) ||
-                              (down_left + up_right == 3 &&
-                               down_left_open && up_right_open));
+  int critical_x_3 =
+      ((down == 3 && down_open) || (left == 3 && left_open) ||
+       (right == 3 && right_open) || (up == 3 && up_open) ||
+       (down_left == 3 && down_left_open) ||
+       (down_right == 3 && down_right_open) || (up_left == 3 && up_left_open) ||
+       (up_right == 3 && up_right_open));
 
-  int critical_o_3 = ((down == -3 && down_open) || (left == -3 && left_open) ||
-                      (right == -3 && right_open) || (up == -3 && up_open) ||
-                      (down_left == -3 && down_left_open) ||
-                      (down_right == -3 && down_right_open) ||
-                      (up_left == -3 && up_left_open) ||
-                      (up_right == -3 && up_right_open));
-                      
-  
-  int critical_special_o_3 = ((down + up == -3 && down_open && up_open) ||
-                              (left + right == -3 && left_open && right_open) ||
-                              (down_right + up_left == -3 && 
-                              down_right_open && up_left_open) ||
-                              (down_left + up_right == -3 &&
-                              down_left_open && up_right_open));
-  
+  int critical_special_x_3 =
+      ((down + up == 3 && down_open && up_open) ||
+       (left + right == 3 && left_open && right_open) ||
+       (down_right + up_left == 3 && down_right_open && up_left_open) ||
+       (down_left + up_right == 3 && down_left_open && up_right_open));
+
+  int critical_o_3 =
+      ((down == -3 && down_open) || (left == -3 && left_open) ||
+       (right == -3 && right_open) || (up == -3 && up_open) ||
+       (down_left == -3 && down_left_open) ||
+       (down_right == -3 && down_right_open) ||
+       (up_left == -3 && up_left_open) || (up_right == -3 && up_right_open));
+
+  int critical_special_o_3 =
+      ((down + up == -3 && down_open && up_open) ||
+       (left + right == -3 && left_open && right_open) ||
+       (down_right + up_left == -3 && down_right_open && up_left_open) ||
+       (down_left + up_right == -3 && down_left_open && up_right_open));
+
   // add to totals, avoiding double counting
 
-  x_3_count += critical_x_3;
-  if (!critical_x_3) {
-    special_x_3_count += critical_special_x_3;
-  }
+  // x_3_count += critical_x_3;
+  // if (!critical_x_3) {
+  //   special_x_3_count += critical_special_x_3;
+  // }
 
-  o_3_count += critical_o_3;
-  if (!critical_o_3) {
-    special_o_3_count += critical_special_o_3;
-  }
+  // o_3_count += critical_o_3;
+  // if (!critical_o_3) {
+  //   special_o_3_count += critical_special_o_3;
+  // }
 
   // add the the set of highest importance
   if (critical_x_4 || critical_o_4) {
     critical_4.insert(idx(r, c));
-  } else if (critical_x_3 || critical_o_3 || 
-             critical_special_o_3 || critical_special_o_3) {
+  } else if (critical_x_3 || critical_o_3 || critical_special_o_3 ||
+             critical_special_o_3) {
     critical_3.insert(idx(r, c));
   }
+
+  int counts[8] = {down,      up,       left,       right,
+                   down_left, up_right, down_right, up_left};
+  int tile_score = process_counts(counts);
+  return tile_score;
 }
 
 int Engine_Board::game_over(int r, int c) {
@@ -256,14 +276,12 @@ int Engine_Board::eval() {
   Timer t;
   // number of live 4's for x and o
   int x_4_count = 0, o_4_count = 0;
-  // number of live 3's for x and o
-  int x_3_count = 0, o_3_count = 0;
-  int x_3_special_count = 0, o_3_special_count = 0;
 
   // clear critical square set
   critical_4.clear();
   critical_3.clear();
 
+  int eval = 0;
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       // check for 5 in a row if square occupied
@@ -273,19 +291,14 @@ int Engine_Board::eval() {
           return winner;
         }
       } else { // check if filling in the spot would form live 4 or 3
-        check_5_straight(r, c, x_4_count, o_4_count, x_3_count, o_3_count,
-                         x_3_special_count, o_3_special_count);
+        eval += check_5_straight(r, c, x_4_count, o_4_count);
       }
     }
   }
-  
-  // TODO: this stuff is not correct yet with the 3 counts, double counting
-  cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
-  cout << "3 counts: " << x_3_count << ", " << o_3_count << endl;
-  cout << "Special 3 counts: " << x_3_special_count << ", " << o_3_special_count << endl;
 
-  x_3_count = x_3_count / 2 + x_3_special_count; // the regular counts are double counted
-  o_3_count = o_3_count / 2 + o_3_special_count;
+  // TODO: this stuff is not correct yet with the 3 counts, double counting
+  // cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
+
   // if you have a live 4 and it is your turn, you will win
   if ((x_4_count > 0 && turn == 1) || (o_4_count > 0 && turn == -1)) {
     return turn * INEVITABLE_WIN_4_EVAL;
@@ -315,7 +328,7 @@ int Engine_Board::eval() {
   //     }
   //   }
   //   else { // their turn and you have at least a live 3
-      
+
   //   }
   // }
   // if (o_3_count >= 1) {
@@ -324,7 +337,7 @@ int Engine_Board::eval() {
   //   }
   // }
   eval_time += t.elapsed();
-  return x_3_count - o_3_count;
+  return eval;
 }
 
 // update the list of moves
@@ -402,7 +415,8 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   // }
   cout << endl;
   double elapsed = t.elapsed();
-  cout << "Eval Count: " << eval_count << ", Eval Time: " << eval_time << ", Total Time: " << elapsed << endl;
+  cout << "Eval Count: " << eval_count << ", Eval Time: " << eval_time
+       << ", Total Time: " << elapsed << endl;
 
   // sort lines in order of evaluation, and keep only top lines
   if (turn == 1)
