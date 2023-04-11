@@ -401,19 +401,17 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   Timer t;
   bool isMax = turn == 1;
   vector<MinimaxResult> lines;
-  if (prune) {
-    result = minimax_alpha_beta(depth, 0, lines, isMax, INT_MIN, INT_MAX);
-  }
-  // else {
-  //   result = minimax(depth, 0, isMax);
-  // }
+
+  result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, prune);
+
   // cout << result.score << ": ";
   // for (auto &move : result.moves) {
   //   int r = move.first;
   //   int c = move.second;
   //   cout << "(" << r << "," << c << ") ";
   // }
-  cout << endl;
+  // cout << endl;
+
   double elapsed = t.elapsed();
   cout << "Eval Count: " << eval_count << ", Eval Time: " << eval_time
        << ", Total Time: " << elapsed << endl;
@@ -433,63 +431,10 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   return lines;
 }
 
-MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
-  if (depth == max_depth) {
-    return MinimaxResult{eval(), vector<pair<int, int>>()};
-  }
 
-  MinimaxResult best_move;
-  int e = eval();
-  vector<int> moves = get_candidate_moves();
-
-  best_move.score = isMax ? INT_MIN : INT_MAX;
-
-  for (int i = 0; i < moves.size(); i++) {
-    char old_r_min = r_min, old_c_min = c_min;
-    char old_r_max = r_max, old_c_max = c_max;
-    make_move(moves[i]);
-
-    if (game_over()) {
-      int e = eval();
-      undo_move(moves[i]);
-      return MinimaxResult{e, vector<pair<int, int>>(1, rc(i))};
-    }
-
-    MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-
-    if (isMax) {
-      if (res.score > best_move.score) {
-        best_move.score = res.score;
-        best_move.moves = res.moves;
-        best_move.moves.push_back(rc(moves[i]));
-      }
-    } else {
-      if (res.score < best_move.score) {
-        best_move.score = res.score;
-        best_move.moves = res.moves;
-        best_move.moves.push_back(rc(moves[i]));
-      }
-    }
-
-    undo_move(moves[i]);
-    r_min = old_r_min;
-    c_min = old_c_min;
-    r_max = old_r_max;
-    c_max = old_c_max;
-
-    if (best_move.score == GAME_OVER_EVAL ||
-        best_move.score == -1 * GAME_OVER_EVAL) {
-      break;
-    }
-  }
-
-  return best_move;
-}
-
-MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
-                                               vector<MinimaxResult> &lines,
-                                               bool isMax, int alpha,
-                                               int beta) {
+MinimaxResult Engine_Board::minimax(int max_depth, int depth, 
+                                    vector<MinimaxResult> &lines, bool isMax,
+                                    int alpha, int beta, bool prune) {
   if (depth == max_depth) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
@@ -511,8 +456,8 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))};
     }
 
-    MinimaxResult res =
-        minimax_alpha_beta(max_depth, depth + 1, lines, !isMax, alpha, beta);
+    MinimaxResult res = minimax(max_depth, depth + 1, lines, !isMax, 
+                                alpha, beta, prune);
     res.moves.push_back(rc(moves[i]));
 
     // add to set of lines if at root node
@@ -540,10 +485,10 @@ MinimaxResult Engine_Board::minimax_alpha_beta(int max_depth, int depth,
     r_max = old_r_max;
     c_max = old_c_max;
 
-    if (/*alpha == GAME_OVER_EVAL || beta == -1*GAME_OVER_EVAL || */ beta <=
-        alpha)
+    if (prune && beta <= alpha)
       break;
   }
+
 
   return best_move;
 }
