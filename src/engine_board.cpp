@@ -320,7 +320,12 @@ int Engine_Board::count_direction(int r, int c, int dr, int dc) {
   return count * cur;
 }
 
-bool sign(int x) { return x > 0; }
+int sign(int x) {
+  if (x >= 0) {
+    return 1;
+  }
+  return 0;
+}
 
 TileSummary Engine_Board::summarize_empty_tile(int r, int c) {
   TileSummary summary = {0, 0};
@@ -332,17 +337,22 @@ TileSummary Engine_Board::summarize_empty_tile(int r, int c) {
     if (sign(count1) != sign(count2)) {
       summary.x = max(summary.x, max(count1, count2));
       summary.o = max(summary.o, max(-count1, -count2));
-    } else{
+    } else {
       if (count1 + count2 > 0) {
         summary.x = max(summary.x, count1 + count2);
       } else {
         summary.o = max(summary.o, -count1 - count2);
-      } 
+      }
     }
   }
   summary.x = min(summary.x, 4);
   summary.o = min(summary.o, 4);
   return summary;
+}
+
+int Engine_Board::summary_score(TileSummary ts) {
+  int diff = ts.x - ts.o;
+  return sign(diff) * (diff * diff);
 }
 
 int Engine_Board::eval() {
@@ -356,6 +366,8 @@ int Engine_Board::eval() {
   critical_4.clear();
   critical_3.clear();
 
+  int e_score = 0;
+
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       // check for 5 in a row if square occupied
@@ -367,6 +379,8 @@ int Engine_Board::eval() {
       } else { // check if filling in the spot would form live 4 or 3
         check_5_straight(r, c, x_4_count, o_4_count, x_3_count, o_3_count);
         check_special_3(r, c, x_3_count, o_3_count);
+        TileSummary summary = summarize_empty_tile(r, c);
+        e_score += summary_score(summary);
       }
     }
   }
@@ -400,7 +414,7 @@ int Engine_Board::eval() {
   }
   if (o_3_count >= 1 && turn == -1) {
   }
-  return x_3_count - o_3_count;
+  return e_score;
 }
 
 // update the list of moves

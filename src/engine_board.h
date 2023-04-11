@@ -9,8 +9,8 @@
 
 using namespace std;
 
-const int GAME_OVER_EVAL = 10000;
-const int INEVITABLE_WIN_EVAL = 1000;
+const int GAME_OVER_EVAL = 100000;
+const int INEVITABLE_WIN_EVAL = 10000;
 
 struct Piece {
   char r;
@@ -72,8 +72,13 @@ public:
   int eval_count = 0;
 
   bool in_bounds(int r, int c);
+  // count the number of pieces in a direction from (r,c)
+  // positive if counting x's and negative if counting o's
   int count_direction(int r, int c, int dr, int dc);
+  // compute the max formed straight lines (x's and o's) by placing a piece at (r,c)
   TileSummary summarize_empty_tile(int r, int c);
+  // give a score for an empty tile based of its summary
+  int summary_score(TileSummary ts);
 
 protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
