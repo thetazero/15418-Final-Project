@@ -94,11 +94,12 @@ void search_position() {
       int c = move.second;
       cout << "(" << r << "," << c << ")" << endl;
       b_tmp.make_move(r, c);
-      b_tmp.print();
+      // b_tmp.print();
     }
-    cout << endl;
+    // cout << endl;
     cout << "Best score: " << best_move.score << endl;
     cout << "Eval at current position: " << b.eval() << endl; 
+    cout << endl;
     int r = best_move.moves[0].first, c = best_move.moves[0].second; 
     
   }
@@ -111,6 +112,6 @@ int main() {
   // load_board_and_move();
   // test_engine_board();
   // rng_vs_minimax();
-  // search_position();
+  search_position();
   return 0;
 }

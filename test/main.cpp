@@ -138,6 +138,32 @@ TEST(ENGINE_BOARD, sumarize_empty_tile){
   EXPECT_EQ(board1.summarize_empty_tile(6, 6), TileSummary(4, 0));
 }
 
+TEST(ENGINE_BOARD, e_function){
+  string b1 = R"(
+. . . 
+. x .
+. . .
+  )";
+  Engine_Board board1(b1, 'o', 3);
+  EXPECT_EQ(board1.eval(), 8);
+
+  string b2 = R"(
+x o x
+o . o
+x o x
+  )";
+  Engine_Board board2(b2, 'x', 3);
+  EXPECT_EQ(board2.eval(), 0);
+
+  string b3 = R"(
+x o x o
+o x o x
+x x . o 
+o o x x)";
+  Engine_Board board3(b3, 'x', 3);
+  EXPECT_EQ(board3.eval(), 0);
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
