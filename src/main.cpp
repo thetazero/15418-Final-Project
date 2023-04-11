@@ -122,6 +122,8 @@ int main() {
   ..xxx..
   )";
   Engine_Board board2(b2, 'x', 7);
+  cout << board2.count_direction(1, 0, -1, 1) << endl;
+  board2.summarize_empty_tile(1, 0);
   
   return 0;
 }

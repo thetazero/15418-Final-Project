@@ -35,8 +35,9 @@ const int directions[][2] = {
     {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1},
 };
 
+// half the directions for checking in directions in parallel pairs
 const int half_directions[][2] = {
-    {1, 0}, {0, 1}, {1, 1}, {1, 0},
+    {1, 0}, {0, 1}, {1, 1}, {1, -1},
 };
 
 typedef struct MinimaxResult {

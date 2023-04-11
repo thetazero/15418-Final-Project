@@ -8,6 +8,24 @@ TEST(ENGINE_BOARD, game_over) {
 
   Engine_Board empty_tiny(1);
   EXPECT_EQ(empty_tiny.game_over(), 0);
+
+  Engine_Board x_won(R"(
+x o o o o 
+o x . x .
+o . x . .
+o x . x .
+o x . o x
+  )", 'x', 5);
+  EXPECT_EQ(x_won.game_over(), GAME_OVER_EVAL);
+
+  Engine_Board o_won(R"(
+x o . . . 
+x o . . .
+. o x . .
+. o . x .
+. o . . x
+  )", 'o', 5);
+  EXPECT_EQ(o_won.game_over(), -GAME_OVER_EVAL);
 }
 
 TEST(ENGINE_BOARD, LoadBoard) {
@@ -112,7 +130,12 @@ TEST(ENGINE_BOARD, sumarize_empty_tile){
   EXPECT_EQ(board1.summarize_empty_tile(1, 1), TileSummary(4, 1));
   EXPECT_EQ(board1.summarize_empty_tile(4, 3), TileSummary(2, 3));
   EXPECT_EQ(board1.summarize_empty_tile(3, 1), TileSummary(2, 1));
+  EXPECT_EQ(board1.summarize_empty_tile(3, 5), TileSummary(2, 1));
   EXPECT_EQ(board1.summarize_empty_tile(5, 3), TileSummary(2, 2));
+  EXPECT_EQ(board1.summarize_empty_tile(2, 3), TileSummary(2, 2));
+  EXPECT_EQ(board1.summarize_empty_tile(0, 6), TileSummary(0, 0));
+  EXPECT_EQ(board1.summarize_empty_tile(6, 0), TileSummary(0, 1));
+  EXPECT_EQ(board1.summarize_empty_tile(6, 6), TileSummary(4, 0));
 }
 
 int main(int argc, char **argv) {

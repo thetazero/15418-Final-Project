@@ -287,7 +287,7 @@ int Engine_Board::game_over() {
       if (board[idx(r, c)] != 0) {
         int winner = game_over(r, c);
         if (winner != 0) {
-          return 1;
+          return winner;
         }
       }
     }
@@ -320,16 +320,28 @@ int Engine_Board::count_direction(int r, int c, int dr, int dc) {
   return count * cur;
 }
 
+bool sign(int x) { return x > 0; }
+
 TileSummary Engine_Board::summarize_empty_tile(int r, int c) {
   TileSummary summary = {0, 0};
-  for (auto [dr, dc] : directions) {
-    int count = count_direction(r, c, dr, dc);
-    if (count > 0){
-      summary.x = max(summary.x, count);
-    } else {
-      summary.o = max(summary.o, -count);
+  for (auto [dr, dc] : half_directions) {
+    int count1 = count_direction(r, c, dr, dc);
+    int count2 = count_direction(r, c, -dr, -dc);
+
+    int pos_count, neg_count;
+    if (sign(count1) != sign(count2)) {
+      summary.x = max(summary.x, max(count1, count2));
+      summary.o = max(summary.o, max(-count1, -count2));
+    } else{
+      if (count1 + count2 > 0) {
+        summary.x = max(summary.x, count1 + count2);
+      } else {
+        summary.o = max(summary.o, -count1 - count2);
+      } 
     }
   }
+  summary.x = min(summary.x, 4);
+  summary.o = min(summary.o, 4);
   return summary;
 }
 
