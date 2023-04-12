@@ -402,7 +402,7 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   bool isMax = turn == 1;
   vector<MinimaxResult> lines;
 
-  result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, prune);
+  result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
 
   // cout << result.score << ": ";
   // for (auto &move : result.moves) {
@@ -439,6 +439,8 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
 
+  int num_lines = 3;
+
   MinimaxResult best_move;
   int e = eval();
   vector<int> moves = get_candidate_moves();
@@ -453,6 +455,10 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
     if (game_over()) {
       int e = eval();
       undo_move(moves[i]);
+      r_min = old_r_min;
+      c_min = old_c_min;
+      r_max = old_r_max;
+      c_max = old_c_max;
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))};
     }
 
@@ -485,10 +491,10 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
     r_max = old_r_max;
     c_max = old_c_max;
 
-    if (prune && beta <= alpha)
+    if (prune && (beta < alpha)) {
       break;
+    }    
   }
-
-
+  
   return best_move;
 }

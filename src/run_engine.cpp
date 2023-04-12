@@ -9,6 +9,8 @@
 
 using namespace std;
 
+#define MAX_DEPTH 7
+
 void print_line(MinimaxResult &line) {
   cout << line.score << ": ";
   for (auto &move : line.moves) {
@@ -19,7 +21,7 @@ void print_line(MinimaxResult &line) {
   cout << endl;
 }
 
-void search_position(string file_name) {
+void search_position(string file_name, bool prune) {
   Engine_Board b(file_name);
   cout << "Current Eval: " << b.eval() << endl;
   auto moves = b.get_candidate_moves();
@@ -27,9 +29,9 @@ void search_position(string file_name) {
     cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
   }
   cout << endl;
-  for (int d = 1; d <= 7; d++) {
+  for (int d = 1; d <= MAX_DEPTH; d++) {
     Engine_Board b_tmp(b);
-    vector<MinimaxResult> lines = b.engine_recommendation(d, 3, true);
+    vector<MinimaxResult> lines = b.engine_recommendation(d, 3, prune);
     cout << "Depth: " << d << ", Turn: " << (b.get_turn() == 1 ? "x" : "o")
          << endl;
     for (auto &line : lines) {
@@ -39,12 +41,13 @@ void search_position(string file_name) {
     cout << "Eval at current position: " << b.eval() << endl;
   }
 }
+
 int main(int argc, char *argv[]) {
-  cout << argc << endl;
+  bool prune = true;
   if (argc != 2) {
     printf("Usage: ./run_engine <board_file.txt>\n");
     return 0;
   }
-  search_position(string(argv[1]));
+  search_position(string(argv[1]), prune);
   return 0;
 }
