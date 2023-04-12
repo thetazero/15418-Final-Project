@@ -43,7 +43,7 @@ void rng_vs_minimax(int depth) {
     b.print();
     int eval = b.eval();
     if (eval == 10000 || eval == -10000) {
-      cout << "Number of evals: " << b.eval_count << endl;
+      cout << "Number of evals: " << b.md.eval_count << endl;
       cout << "Game over!\n";
       break;
     }

@@ -272,7 +272,7 @@ int Engine_Board::game_over() {
 }
 
 int Engine_Board::eval() {
-  eval_count++;
+  md.eval_count++;
   Timer t;
   // number of live 4's for x and o
   int x_4_count = 0, o_4_count = 0;
@@ -336,7 +336,7 @@ int Engine_Board::eval() {
   //     return -1*INEVITABLE_WIN_3_EVAL;
   //   }
   // }
-  eval_time += t.elapsed();
+  md.eval_time += t.elapsed();
   return eval;
 }
 
@@ -395,26 +395,18 @@ bool compare_lines_lt(MinimaxResult &l1, MinimaxResult &l2) {
 
 vector<MinimaxResult>
 Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
-  eval_count = 0;
-  eval_time = 0;
-  MinimaxResult result;
+  md.eval_count = 0;
+  md.eval_time = 0;
+  md.prune_count.clear();
+  
   Timer t;
   bool isMax = turn == 1;
   vector<MinimaxResult> lines;
 
-  result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
+  MinimaxResult result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
 
-  // cout << result.score << ": ";
-  // for (auto &move : result.moves) {
-  //   int r = move.first;
-  //   int c = move.second;
-  //   cout << "(" << r << "," << c << ") ";
-  // }
-  // cout << endl;
-
-  double elapsed = t.elapsed();
-  cout << "Eval Count: " << eval_count << ", Eval Time: " << eval_time
-       << ", Total Time: " << elapsed << endl;
+  md.total_time = t.elapsed();
+  md.print();
 
   // sort lines in order of evaluation, and keep only top lines
   if (turn == 1)
@@ -437,8 +429,6 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   if (depth == max_depth) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
-
-  int num_lines = 3;
 
   MinimaxResult best_move;
   int e = eval();
@@ -491,7 +481,21 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
     c_max = old_c_max;
 
     if (prune && (beta < alpha)) {
+      if (md.prune_count.count(depth) > 0) {
+        md.prune_count[depth].second += 1;
+      }
+      else {
+        md.prune_count[depth].second = 1;
+      }
       break;
+    }
+    else {
+      if (md.prune_count.count(depth) > 0) {
+        md.prune_count[depth].first += 1;
+      }
+      else {
+        md.prune_count[depth].first = 1;
+      }
     }
   }
 

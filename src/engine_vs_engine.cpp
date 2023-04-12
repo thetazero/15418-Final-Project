@@ -38,7 +38,7 @@ void engine_vs_engine(int depth_x, int depth_o) {
     b.print();
     int eval = b.eval();
     if (eval == 10000 || eval == -10000) {
-      cout << "Number of evals: " << b.eval_count << endl;
+      cout << "Number of evals: " << b.md.eval_count << endl;
       cout << "Game over!\n";
       break;
     }

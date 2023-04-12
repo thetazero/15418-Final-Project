@@ -2,6 +2,7 @@
 #define ENGINE_BOARD_H
 
 #include "board.h"
+#include <map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -12,11 +13,21 @@ const int GAME_OVER_EVAL = 1000;
 const int INEVITABLE_WIN_4_EVAL = 800;
 const int INEVITABLE_WIN_3_EVAL = 600;
 
-struct Piece {
-  char r;
-  char c;
-  char player; // 1 or -1
-  Piece(char pr, char pc, char p) : r(pr), c(pc), player(p) {}
+struct Search_Metadata {
+  int eval_count;
+  double eval_time, total_time;
+  map<int, pair<int, int>> prune_count; // map depth to (searched/pruned branches)
+
+  void print() {
+    cout << "------------------ Search Statistics --------------------" << endl;
+    cout << "Total Time: " << total_time << " Eval Time: " << eval_time <<
+            " Eval Count: " << eval_count << endl;
+    for (auto i = prune_count.begin(); i != prune_count.end(); i++) {
+      cout << "Depth: " << i->first << " Searched/Pruned: " 
+            << i->second.first << "/" << i->second.second << endl;
+    }
+    cout << "---------------------------------------------------------" << endl;
+  }
 };
 
 typedef struct MinimaxResult {
@@ -48,8 +59,7 @@ public:
   vector<MinimaxResult> engine_recommendation(int depth, int num_lines,
                                               bool prune);
 
-  int eval_count = 0;
-  double eval_time = 0.0;
+  Search_Metadata md;
 
 protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
