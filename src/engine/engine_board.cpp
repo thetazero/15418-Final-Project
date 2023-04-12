@@ -431,8 +431,7 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   return lines;
 }
 
-
-MinimaxResult Engine_Board::minimax(int max_depth, int depth, 
+MinimaxResult Engine_Board::minimax(int max_depth, int depth,
                                     vector<MinimaxResult> &lines, bool isMax,
                                     int alpha, int beta, bool prune) {
   if (depth == max_depth) {
@@ -462,8 +461,8 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))};
     }
 
-    MinimaxResult res = minimax(max_depth, depth + 1, lines, !isMax, 
-                                alpha, beta, prune);
+    MinimaxResult res =
+        minimax(max_depth, depth + 1, lines, !isMax, alpha, beta, prune);
     res.moves.push_back(rc(moves[i]));
 
     // add to set of lines if at root node
@@ -493,8 +492,8 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
 
     if (prune && (beta < alpha)) {
       break;
-    }    
+    }
   }
-  
+
   return best_move;
 }

@@ -63,29 +63,6 @@ Board::Board(string filename) {
   board_file.close();
 }
 
-Board::Board(string board_state, char board_turn, int board_size) {
-  turn = board_turn == 'x' ? 1 : -1;
-  size = board_size;
-  int total = board_size * board_size;
-  board = new char[total];
-  int count = 0;
-  for (int i = 0; i < board_state.length(); i++) {
-    if (board_state[i] == 'x')
-      board[count] = 1;
-    else if (board_state[i] == 'o')
-      board[count] = -1;
-    else if (board_state[i] == '.')
-      board[count] = 0;
-    else if (board_state[i] == ' ' || board_state[i] == '\n') {
-      continue;
-    } else {
-      cout << "invalid piece marker: " << board_state[i] << endl;
-      return;
-    }
-    count += 1;
-  }
-}
-
 Board::Board(Board &b) {
   size = b.size;
   turn = b.turn;
@@ -157,38 +134,32 @@ void Board::save_board(string filename) {
   board_file.close();
 }
 
-string Board::to_string() {
-  string str = "";
+// print the board to console
+void Board::print() {
   if (turn == 1)
-    str += "Next Up: x\n";
+    cout << "Next Up: x\n";
   else
-    str += "Next Up: o\n";
+    cout << "Next Up: o\n";
   for (int r = 0; r < size; r++) {
     for (int c = 0; c < size; c++) {
       int n = board[idx(r, c)];
       if (n == 1)
-        str += "x";
+        cout << "x";
       else if (n == -1)
-        str += "o";
+        cout << "o";
       else
-        str += ".";
+        cout << ".";
 
-      if (c == size - 1){
-        if (r != size - 1) str += "\n";
-      }
+      if (c == size - 1)
+        cout << "\n";
       else
-        str += " ";
+        cout << " ";
     }
   }
-  return str;
-}
-
-// print the board to console
-void Board::print() {
-  cout << to_string() << endl;
+  cout << endl;
 }
 
 // get board size
 int Board::get_size() { return size; }
 
-Board::~Board() { delete[] board; }
+Board::~Board() { delete board; }

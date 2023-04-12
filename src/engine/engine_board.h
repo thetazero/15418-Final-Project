@@ -75,7 +75,7 @@ private:
 
   int process_counts(int *counts);
 
-  MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines, 
+  MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
                         bool isMax, int alpha, int beta, bool prune);
 };
 
