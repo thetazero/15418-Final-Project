@@ -64,7 +64,7 @@ public:
 protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
-  char r_min, c_min, r_max, c_max;
+  int8_t r_min, c_min, r_max, c_max;
 
 private:
   // track critical squares
@@ -83,6 +83,8 @@ private:
   // the same player's chip is empty and not the opposite player's chip
   bool check_direction(int r, int c, int dr, int dc, int &count);
 
+  int sequential_eval(int &x_4_count, int &o_4_count);
+  int ispc_eval(int &x_4_count, int &o_4_count);
   int process_counts(int *counts);
 
   MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,

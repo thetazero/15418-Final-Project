@@ -1,5 +1,6 @@
 #include "engine_board.h"
 #include "timing.h"
+#include "objs/eval_ispc.h"
 #include <algorithm> // std::reverse
 #include <cassert>
 #include <climits>
@@ -271,16 +272,7 @@ int Engine_Board::game_over() {
   return 0;
 }
 
-int Engine_Board::eval() {
-  md.eval_count++;
-  Timer t;
-  // number of live 4's for x and o
-  int x_4_count = 0, o_4_count = 0;
-
-  // clear critical square set
-  critical_4.clear();
-  critical_3.clear();
-
+int Engine_Board::sequential_eval(int &x_4_count, int &o_4_count) {
   int eval = 0;
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
@@ -294,6 +286,58 @@ int Engine_Board::eval() {
         eval += check_5_straight(r, c, x_4_count, o_4_count);
       }
     }
+  }
+
+  return eval;
+}
+
+int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
+  int total = size * size;
+  int *critical_4_mark = new int[total];
+  int *critical_3_mark = new int[total];
+  int win_x, win_o;
+  memset(critical_4_mark, 0, total);
+  memset(critical_3_mark, 0, total);
+  int eval = ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
+                       x_4_count, o_4_count, critical_4_mark, critical_3_mark);
+  
+  if (win_x) {
+    eval = GAME_OVER_EVAL;
+  }
+  else {
+    eval = -1*GAME_OVER_EVAL;
+  }
+  // add to critical set
+  for (int r = r_min; r <= r_max; r++) {
+    for (int c = c_min; c <= c_max; c++) {
+      int i = idx(r, c);
+      if (critical_4_mark[i]) {
+        critical_4.insert(i);
+      }
+      else if (critical_3_mark[i]) {
+        critical_3.insert(i);
+      }
+    }
+  }
+  delete critical_4_mark, critical_3_mark;
+  return eval;
+}
+
+int Engine_Board::eval() {
+  md.eval_count++;
+  Timer t;
+  // number of live 4's for x and o
+  int x_4_count = 0, o_4_count = 0;
+
+  // clear critical square set
+  critical_4.clear();
+  critical_3.clear();
+
+  int eval = sequential_eval(x_4_count, o_4_count);
+  // int eval = ispc_eval(x_4_count, o_4_count);
+  if (eval == GAME_OVER_EVAL || eval == -1*GAME_OVER_EVAL) {
+    md.eval_time += t.elapsed();
+    return eval;
   }
 
   // TODO: this stuff is not correct yet with the 3 counts, double counting
@@ -437,8 +481,8 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   best_move.score = isMax ? INT_MIN : INT_MAX;
 
   for (int i = 0; i < moves.size(); i++) {
-    char old_r_min = r_min, old_c_min = c_min;
-    char old_r_max = r_max, old_c_max = c_max;
+    int8_t old_r_min = r_min, old_c_min = c_min;
+    int8_t old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
 
     if (game_over()) {

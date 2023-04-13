@@ -62,7 +62,7 @@ public:
   int turn;
 
 protected:
-  char *board;
+  int8_t *board;
   int size;
 
   inline int idx(int r, int c) { return r * size + c; }
