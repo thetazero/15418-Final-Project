@@ -476,6 +476,9 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
 
   MinimaxResult best_move;
   int e = eval();
+  if (e == GAME_OVER_EVAL || e == -1*GAME_OVER_EVAL) {
+    return MinimaxResult{eval(), vector<pair<int, int>>()};
+  }
   vector<int> moves = get_candidate_moves();
 
   best_move.score = isMax ? INT_MIN : INT_MAX;
