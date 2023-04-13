@@ -30,4 +30,4 @@ clean:
 	rm -f $(TARGETS)
 
 format:
-	clang-format -i src/engine/*.cpp src/engine/*.h src/*.cpp
+	clang-format -i src/engine/*.cpp src/engine/*.h src/*.cpp src/engine/*.ispc

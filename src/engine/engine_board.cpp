@@ -1,6 +1,6 @@
 #include "engine_board.h"
-#include "timing.h"
 #include "objs/eval_ispc.h"
+#include "timing.h"
 #include <algorithm> // std::reverse
 #include <cassert>
 #include <climits>
@@ -298,14 +298,16 @@ int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
   int win_x, win_o;
   memset(critical_4_mark, 0, total);
   memset(critical_3_mark, 0, total);
-  int eval = ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
-                       x_4_count, o_4_count, critical_4_mark, critical_3_mark);
-  
+
+  int eval =
+      ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
+                      x_4_count, o_4_count, critical_4_mark, critical_3_mark);
+
   if (win_x) {
     eval = GAME_OVER_EVAL;
-  }
-  else {
-    eval = -1*GAME_OVER_EVAL;
+  } 
+  if (win_o) {
+    eval = -1 * GAME_OVER_EVAL;
   }
   // add to critical set
   for (int r = r_min; r <= r_max; r++) {
@@ -313,8 +315,7 @@ int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
       int i = idx(r, c);
       if (critical_4_mark[i]) {
         critical_4.insert(i);
-      }
-      else if (critical_3_mark[i]) {
+      } else if (critical_3_mark[i]) {
         critical_3.insert(i);
       }
     }
@@ -335,7 +336,8 @@ int Engine_Board::eval() {
 
   int eval = sequential_eval(x_4_count, o_4_count);
   // int eval = ispc_eval(x_4_count, o_4_count);
-  if (eval == GAME_OVER_EVAL || eval == -1*GAME_OVER_EVAL) {
+  // cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
+  if (eval == GAME_OVER_EVAL || eval == -1 * GAME_OVER_EVAL) {
     md.eval_time += t.elapsed();
     return eval;
   }
@@ -442,12 +444,13 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   md.eval_count = 0;
   md.eval_time = 0;
   md.prune_count.clear();
-  
+
   Timer t;
   bool isMax = turn == 1;
   vector<MinimaxResult> lines;
 
-  MinimaxResult result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
+  MinimaxResult result =
+      minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
 
   md.total_time = t.elapsed();
   md.print();
@@ -476,7 +479,7 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
 
   MinimaxResult best_move;
   int e = eval();
-  if (e == GAME_OVER_EVAL || e == -1*GAME_OVER_EVAL) {
+  if (e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
   vector<int> moves = get_candidate_moves();
@@ -530,17 +533,14 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
     if (prune && (beta < alpha)) {
       if (md.prune_count.count(depth) > 0) {
         md.prune_count[depth].second += 1;
-      }
-      else {
+      } else {
         md.prune_count[depth].second = 1;
       }
       break;
-    }
-    else {
+    } else {
       if (md.prune_count.count(depth) > 0) {
         md.prune_count[depth].first += 1;
-      }
-      else {
+      } else {
         md.prune_count[depth].first = 1;
       }
     }

@@ -1,6 +1,6 @@
 #include <cassert>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <limits>
 #include <string>
 

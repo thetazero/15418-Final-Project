@@ -16,15 +16,16 @@ const int INEVITABLE_WIN_3_EVAL = 600;
 struct Search_Metadata {
   int eval_count;
   double eval_time, total_time;
-  map<int, pair<int, int>> prune_count; // map depth to (searched/pruned branches)
+  map<int, pair<int, int>>
+      prune_count; // map depth to (searched/pruned branches)
 
   void print() {
     cout << "------------------ Search Statistics --------------------" << endl;
-    cout << "Total Time: " << total_time << " Eval Time: " << eval_time <<
-            " Eval Count: " << eval_count << endl;
+    cout << "Total Time: " << total_time << " Eval Time: " << eval_time
+         << " Eval Count: " << eval_count << endl;
     for (auto i = prune_count.begin(); i != prune_count.end(); i++) {
-      cout << "Depth: " << i->first << " Searched/Pruned: " 
-            << i->second.first << "/" << i->second.second << endl;
+      cout << "Depth: " << i->first << " Searched/Pruned: " << i->second.first
+           << "/" << i->second.second << endl;
     }
     cout << "---------------------------------------------------------" << endl;
   }
