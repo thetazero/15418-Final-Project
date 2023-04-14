@@ -5,7 +5,7 @@ Board::Board(int board_size = 19) {
   turn = 1;
   int total = size * size;
   board = new int8_t[total];
-  memset(board, 0, total);
+  memset(board, 0, total * sizeof(int8_t));
 }
 
 // initialize a board from a file

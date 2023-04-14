@@ -48,7 +48,7 @@ public:
 
   // returns the evaluation of any given position
   int eval();
-
+  void set_parallel_eval_mode(bool parallel);
   // move at board position (r,c)
   int make_move(int r, int c);
   // move at board index i
@@ -66,6 +66,7 @@ protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
   int8_t r_min, c_min, r_max, c_max;
+  bool parallel_eval;
 
 private:
   // track critical squares
@@ -87,7 +88,7 @@ private:
   int sequential_eval(int &x_4_count, int &o_4_count);
   int ispc_eval(int &x_4_count, int &o_4_count);
   int process_counts(int *counts);
-
+  
   MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
                         bool isMax, int alpha, int beta, bool prune);
 };

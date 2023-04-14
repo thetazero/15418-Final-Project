@@ -1,214 +1,27 @@
-2
-Current Eval: 14
-(12,8) (8,12) (8,8) (8,9) (8,10) (8,11) (9,8) (9,9) (9,12) (10,8) (10,9) (10,12) (11,8) (11,10) (11,11) (11,12) (12,9) (12,10) (12,11) (12,12) 
-Depth: 0 (12,8)
-Depth: 0 Eval: -2 (12,8)  (-2147483648,-2)
-Depth: 0 (8,12)
-Depth: 0 Eval: 0 (8,12)  (-2147483648,-2)
-Depth: 0 (8,8)
-Depth: 0 Eval: 8 (8,8)  (-2147483648,-2)
-Depth: 0 (8,9)
-Depth: 0 Eval: 0 (8,9)  (-2147483648,-2)
-Depth: 0 (8,10)
-Depth: 0 Eval: 8 (8,10)  (-2147483648,-2)
-Depth: 0 (8,11)
-Depth: 0 Eval: 2 (8,11)  (-2147483648,-2)
-Depth: 0 (9,8)
-Depth: 0 Eval: 8 (9,8)  (-2147483648,-2)
-Depth: 0 (9,9)
-Depth: 0 Eval: 8 (9,9)  (-2147483648,-2)
-Depth: 0 (9,12)
-Depth: 0 Eval: 2 (9,12)  (-2147483648,-2)
-Depth: 0 (10,8)
-Depth: 0 Eval: 8 (10,8)  (-2147483648,-2)
-Depth: 0 (10,9)
-Depth: 0 Eval: 9 (10,9)  (-2147483648,-2)
-Depth: 0 (10,12)
-Depth: 0 Eval: 8 (10,12)  (-2147483648,-2)
-Depth: 0 (11,8)
-Depth: 0 Eval: 2 (11,8)  (-2147483648,-2)
-Depth: 0 (11,10)
-Depth: 0 Eval: 9 (11,10)  (-2147483648,-2)
-Depth: 0 (11,11)
-Depth: 0 Eval: 8 (11,11)  (-2147483648,-2)
-Depth: 0 (11,12)
-Depth: 0 Eval: 0 (11,12)  (-2147483648,-2)
-Depth: 0 (12,9)
-Depth: 0 Eval: 2 (12,9)  (-2147483648,-2)
-Depth: 0 (12,10)
-Depth: 0 Eval: 8 (12,10)  (-2147483648,-2)
-Depth: 0 (12,11)
-Depth: 0 Eval: 8 (12,11)  (-2147483648,-2)
-Depth: 0 (12,12)
-Depth: 0 Eval: 8 (12,12)  (-2147483648,-2)
-Eval Count: 21, Eval Time: 0.000126145, Total Time: 0.000443045
-Depth: 1, Turn: o
--2: (12,8) 
-0: (8,12) 
-0: (8,9) 
 
-Eval at current position: 14
-Depth: 0 (12,8)
-Depth: 1 (8,7)
-Depth: 1 Eval: 6 (8,7)  (6,2147483647)
-Depth: 1 (8,8)
-Depth: 1 Eval: 8 (8,8)  (8,2147483647)
-Depth: 1 (8,9)
-Depth: 1 Eval: 7 (8,9)  (8,2147483647)
-Depth: 1 (8,10)
-Depth: 1 Eval: 8 (8,10)  (8,2147483647)
-Depth: 1 (8,11)
-Depth: 1 Eval: 4 (8,11)  (8,2147483647)
-Depth: 1 (8,12)
-Depth: 1 Eval: 9 (8,12)  (9,2147483647)
-Depth: 1 (9,7)
-Depth: 1 Eval: 8 (9,7)  (9,2147483647)
-Depth: 1 (9,8)
-Depth: 1 Eval: 5 (9,8)  (9,2147483647)
-Depth: 1 (9,9)
-Depth: 1 Eval: 8 (9,9)  (9,2147483647)
-Depth: 1 (9,12)
-Depth: 1 Eval: 4 (9,12)  (9,2147483647)
-Depth: 1 (10,7)
-Depth: 1 Eval: 4 (10,7)  (9,2147483647)
-Depth: 1 (10,8)
-Depth: 1 Eval: 8 (10,8)  (9,2147483647)
-Depth: 1 (10,9)
-Depth: 1 Eval: 4 (10,9)  (9,2147483647)
-Depth: 1 (10,12)
-Depth: 1 Eval: 8 (10,12)  (9,2147483647)
-Depth: 1 (11,7)
-Depth: 1 Eval: 5 (11,7)  (9,2147483647)
-Depth: 1 (11,8)
-Depth: 1 Eval: 3 (11,8)  (9,2147483647)
-Depth: 1 (11,10)
-Depth: 1 Eval: 4 (11,10)  (9,2147483647)
-Depth: 1 (11,11)
-Depth: 1 Eval: 8 (11,11)  (9,2147483647)
-Depth: 1 (11,12)
-Depth: 1 Eval: 7 (11,12)  (9,2147483647)
-Depth: 1 (12,7)
-Depth: 1 Eval: 5 (12,7)  (9,2147483647)
-Depth: 1 (12,9)
-Depth: 1 Eval: 3 (12,9)  (9,2147483647)
-Depth: 1 (12,10)
-Depth: 1 Eval: 8 (12,10)  (9,2147483647)
-Depth: 1 (12,11)
-Depth: 1 Eval: 5 (12,11)  (9,2147483647)
-Depth: 1 (12,12)
-Depth: 1 Eval: 8 (12,12)  (9,2147483647)
-Depth: 1 (13,7)
-Depth: 1 Eval: 6 (13,7)  (9,2147483647)
-Depth: 1 (13,8)
-Depth: 1 Eval: 5 (13,8)  (9,2147483647)
-Depth: 1 (13,9)
-Depth: 1 Eval: 5 (13,9)  (9,2147483647)
-Depth: 1 (13,10)
-Depth: 1 Eval: 4 (13,10)  (9,2147483647)
-Depth: 1 (13,11)
-Depth: 1 Eval: 8 (13,11)  (9,2147483647)
-Depth: 1 (13,12)
-Depth: 1 Eval: 6 (13,12)  (9,2147483647)
-Depth: 0 Eval: 9 (12,8)  (-2147483648,9)
-Depth: 0 (8,12)
-Depth: 1 (7,8)
-Depth: 1 Eval: 10 (7,8)  (10,9)
-pruned
-Depth: 0 Eval: 10 (8,12)  (-2147483648,9)
-Depth: 0 (8,8)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (8,8)  (-2147483648,9)
-Depth: 0 (8,9)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (8,9)  (-2147483648,9)
-Depth: 0 (8,10)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (8,10)  (-2147483648,9)
-Depth: 0 (8,11)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (8,11)  (-2147483648,9)
-Depth: 0 (9,8)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (9,8)  (-2147483648,9)
-Depth: 0 (9,9)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (9,9)  (-2147483648,9)
-Depth: 0 (9,12)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (9,12)  (-2147483648,9)
-Depth: 0 (10,8)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (10,8)  (-2147483648,9)
-Depth: 0 (10,9)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (10,9)  (-2147483648,9)
-Depth: 0 (10,12)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (10,12)  (-2147483648,9)
-Depth: 0 (11,8)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (11,8)  (-2147483648,9)
-Depth: 0 (11,10)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (11,10)  (-2147483648,9)
-Depth: 0 (11,11)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (11,11)  (-2147483648,9)
-Depth: 0 (11,12)
-Depth: 1 (12,13)
-Depth: 1 Eval: 16 (12,13)  (16,9)
-pruned
-Depth: 0 Eval: 16 (11,12)  (-2147483648,9)
-Depth: 0 (12,9)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (12,9)  (-2147483648,9)
-Depth: 0 (12,10)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (12,10)  (-2147483648,9)
-Depth: 0 (12,11)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (12,11)  (-2147483648,9)
-Depth: 0 (12,12)
-Depth: 1 (12,8)
-Depth: 1 Eval: 800 (12,8)  (800,9)
-pruned
-Depth: 0 Eval: 800 (12,12)  (-2147483648,9)
-Eval Count: 70, Eval Time: 0.000341961, Total Time: 0.00178798
-Depth: 2, Turn: o
-9: (12,8) (8,12) 
-10: (8,12) (7,8) 
-16: (11,12) (12,13) 
+------------------ Search Statistics --------------------
+Total Time: 0.146706 Eval Time: 0.0942601 Eval Count: 6827
+Depth: 0 Searched/Pruned: 53/0
+Depth: 1 Searched/Pruned: 113/51
+Depth: 2 Searched/Pruned: 3248/0
+Depth: 3 Searched/Pruned: 0/3248
+---------------------------------------------------------
+Depth: 4, Turn: o Parallel: 1
+-1000: (8,9) (12,13) (7,8) 
+-1000: (12,13) (13,14) (8,9) 
+-800: (13,10) (14,9) (12,13) (13,14) 
 
-Eval at current position: 14
+Eval at current position: -35
+------------------ Search Statistics --------------------
+Total Time: 0.153893 Eval Time: 0.101827 Eval Count: 6827
+Depth: 0 Searched/Pruned: 53/0
+Depth: 1 Searched/Pruned: 113/51
+Depth: 2 Searched/Pruned: 3248/0
+Depth: 3 Searched/Pruned: 0/3248
+---------------------------------------------------------
+Depth: 4, Turn: o Parallel: 0
+-1000: (8,9) (12,13) (7,8) 
+-1000: (12,13) (13,14) (8,9) 
+-800: (13,10) (14,9) (12,13) (13,14) 
+
+Eval at current position: -35

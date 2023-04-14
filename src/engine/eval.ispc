@@ -184,6 +184,10 @@ static int check_5_straight(int r, int c, int8 *board, int &x_4_counts,
              critical_special_o_3) {
     critical_3[i] = 1;
   }
+  else {
+    critical_4[i] = 0;
+    critical_3[i] = 0;
+  }
 
   int counts[8] = {down,      up,       left,       right,
                    down_left, up_right, down_right, up_left};

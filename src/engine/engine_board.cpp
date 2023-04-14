@@ -24,6 +24,7 @@ Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   c_min = size;
   r_max = -1;
   c_max = -1;
+  parallel_eval = false;
 }
 
 Engine_Board::Engine_Board(string filename) : Board(filename) {
@@ -39,6 +40,7 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
       }
     }
   }
+  parallel_eval = false;
 }
 
 Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
@@ -48,6 +50,7 @@ Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
   c_max = b.c_max;
   critical_4 = b.critical_4;
   critical_3 = b.critical_3;
+  parallel_eval = false;
 }
 
 vector<int> Engine_Board::get_candidate_moves() {
@@ -291,13 +294,17 @@ int Engine_Board::sequential_eval(int &x_4_count, int &o_4_count) {
   return eval;
 }
 
+void Engine_Board::set_parallel_eval_mode(bool parallel) {
+  parallel_eval = parallel;
+}
+
 int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
   int total = size * size;
   int *critical_4_mark = new int[total];
   int *critical_3_mark = new int[total];
-  int win_x, win_o;
-  memset(critical_4_mark, 0, total);
-  memset(critical_3_mark, 0, total);
+  int win_x = 0, win_o = 0;
+  memset(critical_4_mark, 0, total * sizeof(int));
+  memset(critical_3_mark, 0, total * sizeof(int));
 
   int eval =
       ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
@@ -310,16 +317,25 @@ int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
     eval = -1 * GAME_OVER_EVAL;
   }
   // add to critical set
+  // if (md.eval_count < 5) {
+  //   cout << "After: ";
+  // }
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       int i = idx(r, c);
       if (critical_4_mark[i]) {
+        // if (md.eval_count < 5) {
+        //   cout << i << ", ";
+        // }
         critical_4.insert(i);
       } else if (critical_3_mark[i]) {
         critical_3.insert(i);
       }
     }
   }
+  // if (md.eval_count < 5) {
+  //         cout << endl;
+  //       }
   delete critical_4_mark, critical_3_mark;
   return eval;
 }
@@ -334,9 +350,26 @@ int Engine_Board::eval() {
   critical_4.clear();
   critical_3.clear();
 
-  int eval = sequential_eval(x_4_count, o_4_count);
-  // int eval = ispc_eval(x_4_count, o_4_count);
-  // cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
+  // if (md.eval_count < 5) {
+  //   print();
+  //   cout << critical_4.size() << ", " << critical_3.size() << endl;
+  // }
+  int eval;
+  if (parallel_eval) {
+    eval = ispc_eval(x_4_count, o_4_count);
+  }
+  else {
+    eval = sequential_eval(x_4_count, o_4_count);
+  }
+  // if (md.eval_count < 5) {
+  //   cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
+  //   cout << eval << " " << critical_4.size() << ", " << critical_3.size() << endl;
+  //   for (auto i = critical_4.begin(); i != critical_4.end(); i++) {
+  //     cout << *i << ", ";
+  //   }
+  //   cout << endl << endl;
+  // }
+  
   if (eval == GAME_OVER_EVAL || eval == -1 * GAME_OVER_EVAL) {
     md.eval_time += t.elapsed();
     return eval;
@@ -479,9 +512,15 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
 
   MinimaxResult best_move;
   int e = eval();
+  
   if (e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
     return MinimaxResult{eval(), vector<pair<int, int>>()};
   }
+
+  // if (depth == 0) {
+  //   cout << "Eval: " << e << endl;
+  //   cout << critical_4.size() << ", " << critical_3.size() << endl;
+  // }
   vector<int> moves = get_candidate_moves();
 
   best_move.score = isMax ? INT_MIN : INT_MAX;
