@@ -32,7 +32,7 @@ namespace ispc { /* namespace */
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 extern "C" {
 #endif // __cplusplus
-    extern int32_t eval_ispc(int32_t r_min, int32_t r_max, int32_t c_min, int32_t c_max, int32_t size, int8_t * board, int32_t &win_x, int32_t &win_o, int32_t &x_4_count, int32_t &o_4_count, int32_t * critical_4, int32_t * critical_3);
+    extern int32_t eval_ispc(int32_t r_min, int32_t r_max, int32_t c_min, int32_t c_max, int32_t size, int32_t * board, int32_t &win_x, int32_t &win_o, int32_t &x_4_count, int32_t &o_4_count, int32_t * critical_4, int32_t * critical_3);
 #if defined(__cplusplus) && (! defined(__ISPC_NO_EXTERN_C) || !__ISPC_NO_EXTERN_C )
 } /* end extern C */
 #endif // __cplusplus

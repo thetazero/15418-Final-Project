@@ -9,6 +9,7 @@
 
 using namespace std;
 
+typedef int32_t board_t; // test if int8_t is slower than int32_t
 /* Board Details:
 Boards are square, size x size
 There are 2 players: x and o. Empty position is represented by a .
@@ -62,7 +63,7 @@ public:
   int turn;
 
 protected:
-  int8_t *board;
+  board_t *board;
   int size;
 
   inline int idx(int r, int c) { return r * size + c; }

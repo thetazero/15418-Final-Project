@@ -50,7 +50,7 @@ Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
   c_max = b.c_max;
   critical_4 = b.critical_4;
   critical_3 = b.critical_3;
-  parallel_eval = false;
+  parallel_eval = b.parallel_eval;
 }
 
 vector<int> Engine_Board::get_candidate_moves() {
@@ -526,11 +526,12 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   best_move.score = isMax ? INT_MIN : INT_MAX;
 
   for (int i = 0; i < moves.size(); i++) {
-    int8_t old_r_min = r_min, old_c_min = c_min;
-    int8_t old_r_max = r_max, old_c_max = c_max;
+    int old_r_min = r_min, old_c_min = c_min;
+    int old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
 
     if (game_over()) {
+      // cout << "here\n";
       int e = eval();
       undo_move(moves[i]);
       r_min = old_r_min;

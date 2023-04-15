@@ -65,7 +65,7 @@ public:
 protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
-  int8_t r_min, c_min, r_max, c_max;
+  int r_min, c_min, r_max, c_max;
   bool parallel_eval;
 
 private:

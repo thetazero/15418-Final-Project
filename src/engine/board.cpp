@@ -4,8 +4,8 @@ Board::Board(int board_size = 19) {
   size = board_size;
   turn = 1;
   int total = size * size;
-  board = new int8_t[total];
-  memset(board, 0, total * sizeof(int8_t));
+  board = new board_t[total];
+  memset(board, 0, total * sizeof(board_t));
 }
 
 // initialize a board from a file
@@ -31,7 +31,7 @@ Board::Board(string filename) {
     turn = -1;
 
   int total = size * size;
-  board = new int8_t[total];
+  board = new board_t[total];
   int i = 0;
   while (getline(board_file, line)) {
     if (line.size() != (2 * size - 1)) {
@@ -67,8 +67,8 @@ Board::Board(Board &b) {
   size = b.size;
   turn = b.turn;
   int total = size * size;
-  board = new int8_t[total];
-  memcpy(board, b.board, total);
+  board = new board_t[total];
+  memcpy(board, b.board, total * sizeof(board_t));
 }
 
 // make move n on board[r,c]

@@ -37,13 +37,14 @@ void search_depth(Engine_Board &b, int d, bool parallel, bool prune) {
 
 void search_position(string file_name, bool prune) {
   Engine_Board b(file_name);
-  // cout << "Current Eval: " << b.eval(0) << endl;
+  // cout << "Current Eval: " << b.eval() << endl;
   // auto moves = b.get_candidate_moves();
   // for (auto &m : moves) {
   //   cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
   // }
   cout << endl;
-  for (int d = 4; d <= MAX_DEPTH; d++) {
+  b.print();
+  for (int d = 1; d <= MAX_DEPTH; d++) {
     search_depth(b, d, true, prune);
     search_depth(b, d, false, prune);
   }

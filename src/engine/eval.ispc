@@ -1,8 +1,9 @@
 #define GAME_OVER_EVAL 1000
+typedef int32 board_t; // test if 32 bit is faster than 8 bit as the ispc reference says
 
 static inline int idx(int r, int c, int size) { return r * size + c; }
 
-static int game_over(int r, int c, int r_max, int c_max, int8 *board,
+static int game_over(int r, int c, int r_max, int c_max, board_t *board,
                      int size) {
   int r_valid = (r_max - r >= 4);
   int c_valid = (c_max - c >= 4);
@@ -67,7 +68,7 @@ static int game_over(int r, int c, int r_max, int c_max, int8 *board,
 }
 
 static bool check_direction(int r, int c, int dr, int dc, int &count,
-                            int8 *board, int size, int r_min, int r_max,
+                            board_t *board, int size, int r_min, int r_max,
                             int c_min, int c_max) {
   int start_tile =
       board[idx(r + dr, c + dc, size)]; // the first tile in the sequence
@@ -133,7 +134,7 @@ static int process_counts(int counts[]) {
   return sign * diff * diff;
 }
 
-static int check_5_straight(int r, int c, int8 *board, int &x_4_counts,
+static int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
                             int &o_4_counts, int &critical_4, int &critical_3,
                             int size, int r_min, int r_max, int c_min,
                             int c_max) {
@@ -214,7 +215,7 @@ static int check_5_straight(int r, int c, int8 *board, int &x_4_counts,
 
 export uniform int eval_ispc(uniform int r_min, uniform int r_max,
                              uniform int c_min, uniform int c_max,
-                             uniform int size, uniform int8 board[],
+                             uniform int size, uniform board_t board[],
                              uniform int &win_x, uniform int &win_o,
                              uniform int &x_4_count, uniform int &o_4_count,
                              uniform int critical_4[],
