@@ -3,6 +3,16 @@ typedef int32 board_t; // test if 32 bit is faster than 8 bit as the ispc refere
 
 static inline int idx(int r, int c, int size) { return r * size + c; }
 
+static inline uniform int sum_5(int r, int c, int dr, int dc, board_t *board, int size) {
+  uniform int sum;
+  int s;
+  foreach (i = 0 ... 5) {
+    s += board[idx(r + i * dr, r + i * dc, size)];
+  }
+  sum = reduce_add(s);
+  return sum;
+}
+
 static int game_over(int r, int c, int r_max, int c_max, board_t *board,
                      int size) {
   int r_valid = (r_max - r >= 4);
@@ -12,28 +22,19 @@ static int game_over(int r, int c, int r_max, int c_max, board_t *board,
 
   int rr = 0, cc = 0, d1 = 0, d2 = 0; // counts in each direction
   // int rrt = 0, cct = 0, d1t = 0, d2t = 0;
-  // foreach (i = 0 ... 5) {
-  //   if (d1_valid) {
-  //     d1t += board[idx(r + i, c + i, size)];
-  //   }
-
-  //   if (d2_valid) {
-  //     d2t += board[idx(r + i, c - i, size)];
-  //   }
-
-  //   if (r_valid) {
-  //     rrt += board[idx(r + i, c, size)];
-  //   }
-
-  //   if (c_valid) {
-  //     cct += board[idx(r, c + i, size)];
-  //   }
+  // if (d1_valid) {
+  //   d1 = sum_5(r, c, 1, 1, board, size);
   // }
-
-  // rr = reduce_add(rrt);
-  // cc = reduce_add(cct);
-  // d1 = reduce_add(d1t);
-  // d2 = reduce_add(d2t);
+  // if (d2_valid) {
+  //   d2 = sum_5(r, c, 1, -1, board, size);;
+  // }
+  // if (r_valid) {
+  //   rr = sum_5(r, c, 1, 0, board, size);
+  // }
+  // if (c_valid) {
+  //   cc = sum_5(r, c, 0, 1, board, size);
+  // }
+  
 
   if (d1_valid) {
     d1 = (board[idx(r, c, size)] + board[idx(r + 1, c + 1, size)] +

@@ -3,6 +3,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
+#include <unistd.h>
 
 #include "engine/board.h"
 #include "engine/engine_board.h"
@@ -10,45 +11,44 @@
 
 using namespace std;
 
-#define MAX_DEPTH 7
 
-void print_line(MinimaxResult &line) {
-  cout << line.score << ": ";
-  for (auto &move : line.moves) {
-    int r = move.first;
-    int c = move.second;
-    cout << "(" << r << "," << c << ") ";
+void search_depth(Engine_Board &b, int d, int max_depth, bool parallel_search, bool parallel_eval, bool prune) {
+  Engine_Board b_tmp(b);
+  b_tmp.set_parallel_eval_mode(parallel_eval);
+  b_tmp.set_parallel_search_mode(parallel_search);
+  vector<MinimaxResult> lines = b_tmp.engine_recommendation(d, 3, prune);
+  printf("%d,%d,%d,%d,%0.5f,%0.5f", d, parallel_search, parallel_eval, 
+          b_tmp.md.eval_count, b_tmp.md.total_time, b_tmp.md.eval_time);
+  for (int d = 0; d < max_depth; d++) {
+    int searched = 0, pruned = 0;
+    if (b_tmp.md.prune_count.count(d)) {
+      auto &data = b_tmp.md.prune_count.at(d);
+      searched = data.first;
+      pruned = data.second;
+    }
+    printf(",%d,%d", searched, pruned);
   }
-  cout << endl;
+  printf("\n");
 }
 
-void search_position(string file_name, bool prune) {
+void search_position(string file_name, int max_depth, bool prune) {
   Engine_Board b(file_name);
-  cout << "Current Eval: " << b.eval() << endl;
-  auto moves = b.get_candidate_moves();
-  for (auto &m : moves) {
-    cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
-  }
-  cout << endl;
-  for (int d = 1; d <= MAX_DEPTH; d++) {
-    Engine_Board b_tmp(b);
-    vector<MinimaxResult> lines = b.engine_recommendation(d, 3, prune);
-    cout << "Depth: " << d << ", Turn: " << (b.get_turn() == 1 ? "x" : "o")
-         << endl;
-    for (auto &line : lines) {
-      print_line(line);
-    }
-    cout << endl;
-    cout << "Eval at current position: " << b.eval() << endl;
+  for (int d = 1; d <= max_depth; d++) {
+    search_depth(b, d, max_depth, false, true, prune);
+    search_depth(b, d, max_depth, false, false, prune);
+    search_depth(b, d, max_depth, true, true, prune);
+    search_depth(b, d, max_depth, true, false, prune);
   }
 }
 
 int main(int argc, char *argv[]) {
   bool prune = true;
-  if (argc != 2) {
-    printf("Usage: ./run_engine <board_file.txt>\n");
+
+  if (argc != 3) {
+    printf("Usage: ./profile <board_file.txt> <max_depth>\n");
     return 0;
   }
-  search_position(string(argv[1]), prune);
+  search_position(string(argv[1]), atoi(argv[2]), prune);
+
   return 0;
 }

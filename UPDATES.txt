@@ -1,0 +1,33 @@
+4/16/23
+General Notes: 
+- All board files should have the .board extension
+
+Aleksei: TODO
+- create the parallel minimax search
+- in the Engine_Board class, I added a private variable called parallel_search of type bool. 
+  It can be changed by calling the method: set_parallel_search_mode(bool parallel)
+  If set to false, our code should run our current sequential search.
+  If set to true, our code should run your parallel search.
+  Please make your code fit in with this interface, as it is what I'm using for the profiling code
+- finish your unit test thing?
+
+William: UPDATE
+- I wrote a parallel ISPC evaluation function. It's speedup is not a lot yet
+  When I increase the number of tiles searched per iteration, the speedup is higher.
+  The parameter is in engine_boards.h as SEARCH_BOUND_PADDING. At 1 the speedup is around 10-20% on the one board I tested.
+- TODO: We will need to try to experiment more and see how to potentially increase the speedup.
+
+- in ./run_engine, I run one search using parallel eval and one search using sequential eval per depth. The results are the same
+  in terms of the given moves, so it looks like the correctness should be good. However, we seem to have a stack overflow problem
+  or something at high depths, I haven't looked into it too much yet.
+
+- The current set of performance metrics that I am collecting is in the struct Search_Metadata in engine_board.h.
+- I started writing a profiler. It is in the ./prof directory. You should run the python script profile.py.
+  It pretty much loops through all the boards that are in the ./prof/prof_boards directory,
+  and then gets metrics for the 4 combinations of searching/evaluating in parallel or not. 
+  Right now, because we don't have parallel search yet, that feature is not really used yet, but once you get that implemented,
+  it should fit right into the framework without any hassle.
+  Right now, it just stores all the metrics of Search_Metadata into a file called data.txt.
+  Eventually, I will get it to compute some relative speedup metrics automatically and store it into a file as well.
+- I will also eventually add more boards to our profiling set, but right now there is only 1 board.
+

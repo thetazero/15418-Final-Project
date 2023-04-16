@@ -10,7 +10,7 @@ SOURCES := $(ENGINEDIR)/*.cpp
 HEADERS := $(ENGINEDIR)/*.h
 OBJS=$(OBJDIR)/*.o
 
-TARGETS := eval_ispc run_engine engine_vs_random engine_vs_engine eval_board
+TARGETS := eval_ispc run_engine engine_vs_random engine_vs_engine eval_board profile
 all: $(TARGETS)
 
 eval_ispc: $(ENGINEDIR)/eval.ispc
@@ -28,6 +28,9 @@ engine_vs_engine: $(HEADERS) $(SOURCES) src/engine_vs_engine.cpp
 
 eval_board: $(HEADERS) $(SOURCES) src/eval_board.cpp
 	$(CXX) -o $@ $(CFLAGS) src/eval_board.cpp $(SOURCES) $(OBJS)
+
+profile: $(HEADERS) $(SOURCES) src/profile.cpp
+	$(CXX) -o ./prof/$@ $(CFLAGS) src/profile.cpp $(SOURCES) $(OBJS)
 
 clean: 
 	rm -f $(TARGETS)

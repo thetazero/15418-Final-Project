@@ -27,6 +27,7 @@ void search_depth(Engine_Board &b, int d, bool parallel, bool prune) {
   vector<MinimaxResult> lines = b_tmp.engine_recommendation(d, 3, prune);
   cout << "Depth: " << d << ", Turn: " << (b_tmp.get_turn() == 1 ? "x" : "o")
        << " Parallel: " << parallel << endl;
+  b_tmp.md.print();
   for (auto &line : lines) {
     print_line(line);
   }
@@ -53,7 +54,7 @@ void search_position(string file_name, bool prune) {
 int main(int argc, char *argv[]) {
   bool prune = true;
   if (argc != 2) {
-    printf("Usage: ./run_engine <board_file.txt>\n");
+    printf("Usage: ./run_engine <board_file.board>\n");
     return 0;
   }
   search_position(string(argv[1]), prune);

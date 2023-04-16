@@ -12,22 +12,23 @@ using namespace std;
 const int GAME_OVER_EVAL = 1000;
 const int INEVITABLE_WIN_4_EVAL = 800;
 const int INEVITABLE_WIN_3_EVAL = 600;
+const int SEARCH_BOUND_PADDING = 2; // number of tiles outside of last chip to search
 
 struct Search_Metadata {
   int eval_count;
-  double eval_time, total_time;
-  map<int, pair<int, int>>
-      prune_count; // map depth to (searched/pruned branches)
+  double eval_time, total_time, ispc_time;
+  // map depth to (searched/pruned branches)
+  map<int, pair<int, int>> prune_count; 
 
   void print() {
-    cout << "------------------ Search Statistics --------------------" << endl;
+    cout << "---------------------- Search Statistics -------------------------" << endl;
     cout << "Total Time: " << total_time << " Eval Time: " << eval_time
-         << " Eval Count: " << eval_count << endl;
+         << " Eval Count: " << eval_count << " ISPC Time: " << ispc_time << endl;
     for (auto i = prune_count.begin(); i != prune_count.end(); i++) {
       cout << "Depth: " << i->first << " Searched/Pruned: " << i->second.first
            << "/" << i->second.second << endl;
     }
-    cout << "---------------------------------------------------------" << endl;
+    cout << "------------------------------------------------------------------" << endl;
   }
 };
 
@@ -49,6 +50,8 @@ public:
   // returns the evaluation of any given position
   int eval();
   void set_parallel_eval_mode(bool parallel);
+  void set_parallel_search_mode(bool parallel);
+  
   // move at board position (r,c)
   int make_move(int r, int c);
   // move at board index i
@@ -66,7 +69,7 @@ protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
   int r_min, c_min, r_max, c_max;
-  bool parallel_eval;
+  bool parallel_eval, parallel_search;
 
 private:
   // track critical squares

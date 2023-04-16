@@ -25,6 +25,7 @@ Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   r_max = -1;
   c_max = -1;
   parallel_eval = false;
+  parallel_search = false;
 }
 
 Engine_Board::Engine_Board(string filename) : Board(filename) {
@@ -41,6 +42,7 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
     }
   }
   parallel_eval = false;
+  parallel_search = false;
 }
 
 Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
@@ -51,6 +53,7 @@ Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
   critical_4 = b.critical_4;
   critical_3 = b.critical_3;
   parallel_eval = b.parallel_eval;
+  parallel_search = b.parallel_search;
 }
 
 vector<int> Engine_Board::get_candidate_moves() {
@@ -298,6 +301,10 @@ void Engine_Board::set_parallel_eval_mode(bool parallel) {
   parallel_eval = parallel;
 }
 
+void Engine_Board::set_parallel_search_mode(bool parallel) {
+  parallel_search = parallel;
+}
+
 int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
   int total = size * size;
   int *critical_4_mark = new int[total];
@@ -306,36 +313,33 @@ int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
   memset(critical_4_mark, 0, total * sizeof(int));
   memset(critical_3_mark, 0, total * sizeof(int));
 
+  Timer t;
   int eval =
       ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
                       x_4_count, o_4_count, critical_4_mark, critical_3_mark);
-
+  md.ispc_time += t.elapsed();
   if (win_x) {
     eval = GAME_OVER_EVAL;
+    delete critical_4_mark, critical_3_mark;
+    return eval;
   } 
   if (win_o) {
     eval = -1 * GAME_OVER_EVAL;
+    delete critical_4_mark, critical_3_mark;
+    return eval;
   }
   // add to critical set
-  // if (md.eval_count < 5) {
-  //   cout << "After: ";
-  // }
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       int i = idx(r, c);
       if (critical_4_mark[i]) {
-        // if (md.eval_count < 5) {
-        //   cout << i << ", ";
-        // }
         critical_4.insert(i);
       } else if (critical_3_mark[i]) {
         critical_3.insert(i);
       }
     }
   }
-  // if (md.eval_count < 5) {
-  //         cout << endl;
-  //       }
+
   delete critical_4_mark, critical_3_mark;
   return eval;
 }
@@ -449,10 +453,11 @@ int Engine_Board::undo_move(int i) {
 }
 
 void Engine_Board::update_bounds(int r, int c) {
-  r_min = max(min(r - 1, (int)r_min), 0);
-  c_min = max(min(c - 1, (int)c_min), 0);
-  r_max = min(max(r + 1, (int)r_max), size - 1);
-  c_max = min(max(c + 1, (int)c_max), size - 1);
+  int p = SEARCH_BOUND_PADDING;
+  r_min = max(min(r - p, (int)r_min), 0);
+  c_min = max(min(c - p, (int)c_min), 0);
+  r_max = min(max(r + p, (int)r_max), size - 1);
+  c_max = min(max(c + p, (int)c_max), size - 1);
   // print_bounds();
 }
 
@@ -476,17 +481,19 @@ vector<MinimaxResult>
 Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   md.eval_count = 0;
   md.eval_time = 0;
+  md.ispc_time = 0;
   md.prune_count.clear();
 
   Timer t;
   bool isMax = turn == 1;
   vector<MinimaxResult> lines;
 
+  // TODO: make a parallel minimax version, and case on which minimax to run
   MinimaxResult result =
       minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
 
   md.total_time = t.elapsed();
-  md.print();
+  // md.print();
 
   // sort lines in order of evaluation, and keep only top lines
   if (turn == 1)
