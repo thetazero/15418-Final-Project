@@ -51,6 +51,7 @@ public:
   Engine_Board(string filename);
   Engine_Board(string board_state, char turn, int board_size);
   Engine_Board(Engine_Board &b);
+  Engine_Board();
 
   // returns the index of board positions for the moves
   // call make_move(idx) to make one of the moves

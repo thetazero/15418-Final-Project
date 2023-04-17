@@ -8,6 +8,9 @@
 #include <omp.h>
 
 using namespace std;
+
+Engine_Board::Engine_Board() : Engine_Board(19) {} 
+
 Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   r_min = size;
   c_min = size;
@@ -619,11 +622,9 @@ vector<MinimaxResult> Engine_Board::engine_recommendation_omp(int depth, int num
   vector<vector<MinimaxResult>> results(moves.size());
 
 
-  omp_set_dynamic(0);     // Explicitly disable dynamic teams
   omp_set_num_threads(8); 
-  #pragma omp parallel for
+  #pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < moves.size(); i++) {
-    cout << "Thread " << omp_get_thread_num() << " is working on move " << i << endl;
     Engine_Board private_board(*this);
     private_board.make_move(moves[i]);
     results[i] = private_board.engine_recommendation(depth - 1, num_lines, prune);

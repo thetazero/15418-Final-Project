@@ -43,6 +43,9 @@ public:
   // copy constructor
   Board(Board &b);
 
+  // empy constructor
+  Board();
+
   // make move for whoever's turn is up on board[r,c]
   virtual int make_move(int r, int c);
   virtual int make_move(int i);

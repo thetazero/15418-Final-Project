@@ -1,5 +1,7 @@
 #include "board.h"
 
+Board::Board() : Board(19) {}
+
 Board::Board(int board_size = 19) {
   size = board_size;
   turn = 1;

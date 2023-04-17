@@ -7,6 +7,7 @@
 #include "engine_board.h"
 #include "timing.h"
 #include <filesystem>
+#include <omp.h>
 
 using namespace std;
 string file_name = "./boards/19x19.txt";
@@ -109,11 +110,37 @@ void test_engine_board() {
 //   // b.print();
 // }
 
+void omp_vs_normal_benchmark(const int depth, const bool prune){
+  vector<Engine_Board> boards;
+  size_t i = 0;
+  float normal_time_total = 0, omp_time_total = 0;
+  for (const auto & board_file : std::filesystem::directory_iterator("../test/boards/")) {
+    cout << "Board " << board_file.path() << endl;
+    Engine_Board b(board_file.path());
+    Timer t_omp;
+    b.engine_recommendation_omp(depth, 1, prune);
+    float omp_time = t_omp.elapsed();
+    Timer t_normal;
+    b.engine_recommendation(depth, 1, prune);
+    float normal_time = t_normal.elapsed();
+
+    omp_time_total += omp_time;
+    normal_time_total += normal_time;
+
+    cout << "Normal time: " << normal_time << endl;
+    cout << "Omp time: " << omp_time << endl;
+  }
+  cout << "Total time" << endl;
+  cout << "Normal time: " << normal_time_total << endl;
+  cout << "Omp time: " << omp_time_total << endl;
+}
+
 int main() {
   // test_empty_board();
   // load_board_and_move();
   // test_engine_board();
   // rng_vs_minimax();
   // search_position();
+  omp_vs_normal_benchmark(4, true);
   return 0;
 }
