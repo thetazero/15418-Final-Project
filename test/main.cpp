@@ -1,6 +1,8 @@
 #include "engine_board.h"
 #include <gtest/gtest.h>
 #include <algorithm>
+#include <filesystem>
+
 
 TEST(ENGINE_BOARD, game_over) {
   Engine_Board empty(19);
@@ -162,6 +164,105 @@ x x . o
 o o x x)";
   Engine_Board board3(b3, 'x', 3);
   EXPECT_EQ(board3.eval(), 0);
+}
+
+TEST(ENGINE_BOARD, bounds){
+  string easy_win = R"(
+x o . . . 
+x o . . .
+x o . . .
+x o . . .
+. . . . .)";
+  Engine_Board board(easy_win, 'x', 5);
+  EXPECT_EQ(board.r_min, 0);
+  EXPECT_EQ(board.r_max, 4);
+  EXPECT_EQ(board.c_min, 0);
+  EXPECT_EQ(board.c_max, 2);
+}
+
+TEST(ENGINE_BOARD, size){
+  string easy_win = R"(
+x o . . . 
+x o . . .
+x o . . .
+x o . . .
+. . . . .)";
+  Engine_Board board(easy_win, 'x', 5);
+  EXPECT_EQ(board.size, 5);
+
+}
+
+TEST(ENGINE_BOARD, engine_recommendation) {
+  string easy_win = R"(
+x o . . . 
+x o . . .
+x o . . .
+x o . . .
+. . . . .)";
+  Engine_Board board(easy_win, 'x', 5);
+  MinimaxResult result = board.engine_recommendation(1, 1, true)[0];
+  pair<int,int> expected_move = make_pair(4, 0);
+  EXPECT_EQ(result.moves[0], expected_move);
+
+  string easy_win2 = R"(
+. . . . . .
+. . . . . .
+. o x o . .
+. o x . . .
+. . x . . .
+. . . . . .)";
+  Engine_Board board2(easy_win2, 'x', 6);
+  MinimaxResult result2 = board2.engine_recommendation(3, 1, true)[0];
+  vector<pair<int,int>> expected_moves = {
+    make_pair(1, 2),
+    make_pair(5, 2),
+  };
+  EXPECT_TRUE(
+    std::find(expected_moves.begin(), expected_moves.end(), result2.moves[0]) != expected_moves.end()
+  ) << "Expected (1, 2) or (5, 2), got (" << result2.moves.back().first << ", " << result2.moves.front().second << ")";
+
+  string easy_win3 = R"(
+x o . . .
+x o . . .
+x o . . .
+x o x . . 
+. . . . .)";
+  Engine_Board board3(easy_win3, 'x', 5);
+  MinimaxResult result3 = board3.engine_recommendation(1, 1, true)[0];
+  pair<int,int> expected_move3 = make_pair(4, 1);
+  EXPECT_EQ(result3.moves[0], expected_move3);
+}
+
+TEST(ENGINE_BOARD, prunning_consistency) {
+  string path = "boards/";
+  for (const auto & board_file : std::filesystem::directory_iterator(path)) {
+    Engine_Board board(board_file.path());
+    EXPECT_EQ(board.engine_recommendation(3, 1, true)[0].moves[0], board.engine_recommendation(3, 1, false)[0].moves[0]);
+  }
+}
+
+TEST(ENGINE_BOARD, engine_recommendation_with_omp) {
+  string path = "boards/";
+  for (const auto & board_file : std::filesystem::directory_iterator(path)) {
+    Engine_Board board(board_file.path());
+    int move = board.engine_recommendation(3, 1, false)[0].score;
+    int omp_move = board.engine_recommendation_omp(3, 1, false)[0].score;
+    EXPECT_EQ(move, omp_move) << "Board: " << board_file.path() << 
+    " gave a different score with and without OpenMP." << 
+    " Expected: " << move << " Got: " << omp_move << endl;
+  }
+}
+
+TEST(ENGINE_BOARD, engine_recommendation_with_omp_pruning) {
+  string path = "boards/";
+  for (const auto & board_file : std::filesystem::directory_iterator(path)) {
+    Engine_Board board(board_file.path());
+    int move = board.engine_recommendation(3, 1, true)[0].score;
+    int omp_move = board.engine_recommendation_omp(3, 1, true)[0].score;
+    EXPECT_EQ(move, omp_move) << "Board: " << board_file.path() << 
+    " gave a different score with and without OpenMP." << 
+    " Expected: " << move << " Got: " << omp_move << endl;
+  }
 }
 
 int main(int argc, char **argv) {

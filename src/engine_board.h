@@ -67,7 +67,8 @@ public:
   int undo_move(int i);
   int game_over();
   // recomend a move after searching for max_depth of depth
-  MinimaxResult engine_recommendation(int depth, bool prune);
+  std::vector<MinimaxResult> engine_recommendation(int depth, int num_lines, bool prune);
+  std::vector<MinimaxResult> engine_recommendation_omp(int depth, int num_lines, bool prune);
 
   int eval_count = 0;
 
@@ -80,10 +81,11 @@ public:
   // give a score for an empty tile based of its summary
   int summary_score(TileSummary ts);
 
-protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
   char r_min, c_min, r_max, c_max;
+
+protected:
 
 private:
   // track critical squares
@@ -103,9 +105,8 @@ private:
   void check_special_3(int r, int c, int &x_3_count, int &o_3_count);
   void check_special(int r, int c, int dr, int dc, int &x_3, int &o_3);
 
-  MinimaxResult minimax(int max_depth, int depth, bool isMax);
-  MinimaxResult minimax_alpha_beta(int max_depth, int depth, bool isMax,
-                                   int alpha, int beta);
+  MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
+                        bool isMax, int alpha, int beta, bool prune);
 };
 
 #endif

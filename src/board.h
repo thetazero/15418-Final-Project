@@ -62,10 +62,10 @@ public:
 
   ~Board();
   int turn;
+  int size;
 
 protected:
   char *board;
-  int size;
 
   inline int idx(int r, int c) { return r * size + c; }
   inline pair<int, int> rc(int i) { return make_pair(i / size, i % size); }

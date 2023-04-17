@@ -6,6 +6,7 @@
 #include "board.h"
 #include "engine_board.h"
 #include "timing.h"
+#include <filesystem>
 
 using namespace std;
 string file_name = "./boards/19x19.txt";
@@ -77,41 +78,42 @@ void test_engine_board() {
 //   b.save_board(file_name);
 // }
 
-void search_position() {
-  Engine_Board b(file_name);
-  cout << "Current Eval: " << b.eval() << endl;
-  auto moves = b.get_candidate_moves();
-  for (auto &m : moves) {
-    cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
-  }
-  cout << endl;
-  for (int d = 1; d <= 7; d++) {
-    Engine_Board b_tmp(b);
-    MinimaxResult best_move = b.engine_recommendation(d, true);
-    cout << "Depth: " << d << endl;
-    for (auto &move : best_move.moves) {
-      int r = move.first;
-      int c = move.second;
-      cout << "(" << r << "," << c << ")" << endl;
-      b_tmp.make_move(r, c);
-      // b_tmp.print();
-    }
-    // cout << endl;
-    cout << "Best score: " << best_move.score << endl;
-    cout << "Eval at current position: " << b.eval() << endl; 
-    cout << endl;
-    int r = best_move.moves[0].first, c = best_move.moves[0].second; 
+// void search_position() {
+//   Engine_Board b(file_name);
+//   cout << "Current Eval: " << b.eval() << endl;
+//   auto moves = b.get_candidate_moves();
+//   for (auto &m : moves) {
+//     cout << "(" << m / b.get_size() << "," << m % b.get_size() << ") ";
+//   }
+//   cout << endl;
+//   for (int d = 1; d <= 7; d++) {
+//     Engine_Board b_tmp(b);
+//     MinimaxResult best_move = b.engine_recommendation(d, true);
+//     cout << "Depth: " << d << endl;
+//     for (auto &move : best_move.moves) {
+//       int r = move.first;
+//       int c = move.second;
+//       cout << "(" << r << "," << c << ")" << endl;
+//       b_tmp.make_move(r, c);
+//       // b_tmp.print();
+//     }
+//     // cout << endl;
+//     cout << "Best score: " << best_move.score << endl;
+//     cout << "Eval at current position: " << b.eval() << endl; 
+//     cout << endl;
+//     int r = best_move.moves[0].first, c = best_move.moves[0].second; 
     
-  }
+//   }
     
-  // b.make_move(r, c);
-  // b.print();
-}
+//   // b.make_move(r, c);
+//   // b.print();
+// }
+
 int main() {
   // test_empty_board();
   // load_board_and_move();
   // test_engine_board();
   // rng_vs_minimax();
-  search_position();
+  // search_position();
   return 0;
 }
