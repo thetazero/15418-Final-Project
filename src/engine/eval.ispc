@@ -136,7 +136,7 @@ static int process_counts(int counts[]) {
 }
 
 static int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
-                            int &o_4_counts, int &critical_4, int &critical_3,
+                            int &o_4_counts, int &critical_x_4, int &critical_o_4, int &critical_3,
                             int size, int r_min, int r_max, int c_min,
                             int c_max) {
   // consecutive counts in each direction
@@ -160,22 +160,21 @@ static int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
   bool up_right_open = check_direction(r, c, -1, 1, up_right, board, size,
                                        r_min, r_max, c_min, c_max);
 
-  int critical_x_4 =
+  critical_x_4 =
       ((down == 4) || (up == 4) || (left == 4) || (right == 4) ||
        (down_left == 4) || (up_right == 4) || (down_right == 4) ||
        (up_left == 4) || (down + up >= 4) || (down_right + up_left >= 4) ||
        (right + left >= 4) || (down_left + up_right >= 4));
-  int critical_o_4 =
+  critical_o_4 =
       ((down == -4) || (up == -4) || (left == -4) || (right == -4) ||
        (down_left == -4) || (up_right == -4) || (down_right == -4) ||
        (up_left == -4) || (down + up <= -4) || (down_right + up_left <= -4) ||
        (right + left <= -4) || (down_left + up_right <= -4));
 
   // add to totals if found a live 3 or 4
-  int i = idx(r, c, size);
   x_4_counts += critical_x_4;
   o_4_counts += critical_o_4;
-
+  
   // TODO: this stuff is not correct yet, double counting issues
   int critical_x_3 =
       ((down == 3 && down_open) || (left == 3 && left_open) ||
@@ -204,7 +203,7 @@ static int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
        (down_left + up_right == -3 && down_left_open && up_right_open));
 
   // add the the set of highest importance
-  critical_4 = critical_x_4 || critical_o_4;
+  int critical_4 = critical_x_4 || critical_o_4;
   critical_3 = !critical_4 && (critical_x_3 || critical_o_3 || critical_special_o_3 ||
              critical_special_o_3);
 
@@ -230,22 +229,24 @@ export uniform int eval_ispc(uniform int r_min, uniform int r_max,
   foreach (r = r_min... r_max + 1, c = c_min... c_max + 1) {
     // check for 5 in a row if square occupied
     int i = idx(r, c, size);
-    if (board[i] != 0) {
-      int winner = game_over(r, c, r_max, c_max, board, size);
-      if (winner != 0) {
-        if (winner > 0) {
-          partial_win_x = 1;
-        } else {
-          partial_win_o = 1;
-        }
-      }
-    } else { // check if filling in the spot would form live 4 or 3
-      int critical_4_mark, critical_3_mark;
-      partial_eval += check_5_straight(
-          r, c, board, partial_x_4_count, partial_o_4_count, critical_4_mark,
+    
+    int critical_x_4, critical_o_4, critical_3_mark;
+    int tile = board[i];
+    int old_x_4_count = partial_x_4_count, old_o_4_count = partial_o_4_count;
+    int local_eval = check_5_straight(
+          r, c, board, partial_x_4_count, partial_o_4_count, critical_x_4, critical_o_4,
           critical_3_mark, size, r_min, r_max, c_min, c_max);
-      critical_4[i] = critical_4_mark;
+    
+    if (tile == 0) {
+      partial_eval += local_eval;
+      critical_4[i] = critical_x_4 || critical_o_4;
       critical_3[i] = critical_3_mark;
+    }
+    else {
+      partial_win_x = tile == 1 && critical_x_4;
+      partial_win_o = tile == -1 && critical_o_4;
+      partial_x_4_count = old_x_4_count;
+      partial_o_4_count = old_o_4_count;
     }
   }
   eval = reduce_add(partial_eval);

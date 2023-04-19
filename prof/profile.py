@@ -2,13 +2,10 @@ import subprocess
 import os
 import pathlib
 import numpy as np
+import sys
 
 PROF_BOARD_DIR = "./prof_boards/"
-DEPTH = 2
-NUM_ROWS_PER_BOARD = 4 * DEPTH # each combo of parallel search/eval at each depth
 DATA_FILE_NAME = "./data.txt"
-
-
 
 def get_board_files():
     res = os.listdir(PROF_BOARD_DIR)
@@ -18,9 +15,10 @@ def get_board_files():
             board_files.append(f)
     return board_files
 
-def gather_board_data(board_files):
+def gather_board_data(board_files, depth):
+    NUM_ROWS_PER_BOARD = 4 * depth # each combo of parallel search/eval at each depth
     cols = ['Board', 'Depth', 'Par-S', 'Par-E', 'Evals', 'Total-T', 'Eval-T']
-    for i in range(DEPTH):
+    for i in range(depth):
         cols.append('S:' + str(i))
         cols.append('P:' + str(i))
 
@@ -28,7 +26,7 @@ def gather_board_data(board_files):
     all_data[0] = np.array(cols)
     for i in range(len(board_files)):
         f = PROF_BOARD_DIR + board_files[i]
-        args = ["./profile", f, str(DEPTH)]
+        args = ["./profile", f, str(depth)]
         p = subprocess.run(args, capture_output=True)
         out = p.stdout.decode("utf-8")
         board_data = []
@@ -42,8 +40,9 @@ def gather_board_data(board_files):
 
 
 def main():
+    depth = int(sys.argv[1])
     board_files = get_board_files()
-    data = gather_board_data(board_files)
+    data = gather_board_data(board_files, depth)
     np.savetxt(DATA_FILE_NAME, data, fmt="%-8s")
 
     profile_data = np.array(data[1:, 1:], dtype=float)
