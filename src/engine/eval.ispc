@@ -68,7 +68,7 @@ static int game_over(int r, int c, int r_max, int c_max, board_t *board,
   return 0;
 }
 
-static bool check_direction(int r, int c, int dr, int dc, int &count,
+static inline bool check_direction(int r, int c, int dr, int dc, int &count,
                             board_t *board, int size, int r_min, int r_max,
                             int c_min, int c_max) {
   int start_tile =
@@ -112,7 +112,7 @@ static inline int my_min(int n1, int n2) {
   }
 }
 
-static int process_counts(int counts[]) {
+static inline int process_counts(int counts[]) {
   int max_x = 0, max_o = 0;
   for (int i = 0; i < 4; i++) {
     int c1 = counts[2 * i];
@@ -135,7 +135,7 @@ static int process_counts(int counts[]) {
   return sign * diff * diff;
 }
 
-static int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
+static inline int check_5_straight(int r, int c, board_t *board, int &x_4_counts,
                             int &o_4_counts, int &critical_x_4, int &critical_o_4, int &critical_3,
                             int size, int r_min, int r_max, int c_min,
                             int c_max) {
