@@ -70,6 +70,8 @@ public:
   // recomend a move after searching for max_depth of depth
   std::vector<MinimaxResult> engine_recommendation(int depth, int num_lines, bool prune);
   std::vector<MinimaxResult> engine_recommendation_omp(int depth, int num_lines, bool prune);
+  // max speed, only returns the best move
+  int fast_engine_recommendation(int depth);
 
   int eval_count = 0;
 
@@ -108,6 +110,13 @@ private:
 
   MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
                         bool isMax, int alpha, int beta, bool prune);
+  MinimaxResult minimax_omp(int max_depth, int depth, vector<MinimaxResult> &lines,
+                        bool isMax, int alpha, int beta, bool prune);
+
+  // fast implementation of minimax that only searches for the best move
+  int fast_minimax(int max_depth, int depth, bool isMax, int alpha, int beta);
+  // fast_minimax sets this to the best move from the root
+  int fast_root_best_move;
 };
 
 #endif

@@ -3,13 +3,17 @@
 #include <algorithm> // std::reverse
 #include <cassert>
 #include <climits>
+#include <omp.h>
 #include <stdio.h>
 #include <utility>
-#include <omp.h>
+
+pair<int,int> readable_move(int i, int size) {
+  return make_pair(i / size, i % size);
+}
 
 using namespace std;
 
-Engine_Board::Engine_Board() : Engine_Board(19) {} 
+Engine_Board::Engine_Board() : Engine_Board(19) {}
 
 Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   r_min = size;
@@ -500,47 +504,6 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
   return lines;
 }
 
-// MinimaxResult Engine_Board::minimax(int max_depth, int depth, bool isMax) {
-//   if (depth == max_depth) {
-//     return MinimaxResult{eval(), -1};
-//   }
-//   MinimaxResult best_move;
-//   vector<int> moves = get_candidate_moves();
-//   if (isMax) {
-//     best_move.score = -999999;
-//     for (int i = 0; i < 3; i++) {
-//       make_move(moves[i]);
-//       print();
-//       if (game_over()) {
-//         cout << eval() << endl;
-//         return MinimaxResult{eval(), 0};
-//       }
-//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-//       if (res.score > best_move.score) {
-//         best_move.score = res.score;
-//         best_move.move = moves[i];
-//       }
-//       undo_move(moves[i]);
-//     }
-//   } else {
-//     best_move.score = 999999;
-//     for (int i = 0; i < 3; i++) {
-//       make_move(moves[i]);
-//       print();
-//       if (game_over()) {
-//         return MinimaxResult{eval(), 0};
-//       }
-//       MinimaxResult res = minimax(max_depth, depth + 1, !isMax);
-//       if (res.score < best_move.score) {
-//         best_move.score = res.score;
-//         best_move.move = moves[i];
-//       }
-//       undo_move(moves[i]);
-//     }
-//   }
-//   return best_move;
-// }
-
 MinimaxResult Engine_Board::minimax(int max_depth, int depth,
                                     vector<MinimaxResult> &lines, bool isMax,
                                     int alpha, int beta, bool prune) {
@@ -616,18 +579,18 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   return best_move;
 }
 
-vector<MinimaxResult> Engine_Board::engine_recommendation_omp(int depth, int num_lines,
-                                                     bool prune) {
+vector<MinimaxResult>
+Engine_Board::engine_recommendation_omp(int depth, int num_lines, bool prune) {
   vector<int> moves = get_candidate_moves();
   vector<vector<MinimaxResult>> results(moves.size());
 
-
-  omp_set_num_threads(8); 
-  #pragma omp parallel for schedule(dynamic)
+  omp_set_num_threads(8);
+#pragma omp parallel for schedule(dynamic)
   for (int i = 0; i < moves.size(); i++) {
     Engine_Board private_board(*this);
     private_board.make_move(moves[i]);
-    results[i] = private_board.engine_recommendation(depth - 1, num_lines, prune);
+    results[i] =
+        private_board.engine_recommendation(depth - 1, num_lines, prune);
   }
 
   vector<MinimaxResult> lines;
@@ -648,4 +611,63 @@ vector<MinimaxResult> Engine_Board::engine_recommendation_omp(int depth, int num
     reverse(line.moves.begin(), line.moves.end()); // moves are stored backwards
   }
   return lines;
+}
+
+int Engine_Board::fast_minimax(const int max_depth, const int depth, const bool isMax, int alpha, int beta) {
+  int e = eval();
+  if (depth == max_depth || e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
+    return e;
+  }
+
+  // if (depth == 0) {
+  //   cout << "Eval: " << e << endl;
+  //   cout << critical_4.size() << ", " << critical_3.size() << endl;
+  // }
+  vector<int> moves = get_candidate_moves();
+  int best_move = isMax ? INT_MIN : INT_MAX;
+
+  for (int i = 0; i < moves.size(); i++) {
+    int old_r_min = r_min, old_c_min = c_min;
+    int old_r_max = r_max, old_c_max = c_max;
+    make_move(moves[i]);
+    int res = fast_minimax(max_depth, depth + 1, !isMax, alpha, beta);
+
+
+    if (isMax) {
+      if (res > best_move) {
+        best_move = res;
+        if (depth == 0) {
+          fast_root_best_move = moves[i];
+        }
+      }
+      alpha = max(alpha, best_move);
+    } else {
+      if (res < best_move) {
+        best_move = res;
+        if (depth == 0) {
+          fast_root_best_move = moves[i];
+        }
+      }
+      beta = min(beta, best_move);
+    }
+
+    undo_move(moves[i]);
+    r_min = old_r_min;
+    c_min = old_c_min;
+    r_max = old_r_max;
+    c_max = old_c_max;
+
+    if (beta < alpha) {
+      break;
+    }
+  }
+
+  return best_move;
+}
+
+
+int Engine_Board::fast_engine_recommendation(int depth) {
+  bool isMax = turn == 1;
+  fast_minimax(depth, 0, isMax, INT_MIN, INT_MAX);
+  return fast_root_best_move;
 }

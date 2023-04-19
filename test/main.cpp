@@ -265,6 +265,16 @@ TEST(ENGINE_BOARD, engine_recommendation_with_omp_pruning) {
   }
 }
 
+TEST(ENGINE_BOARD, fast_recommendation_consistency) {
+  string path = "boards/";
+  for (const auto & board_file : std::filesystem::directory_iterator(path)) {
+    Engine_Board board(board_file.path());
+    pair<int,int> basic_move = board.engine_recommendation(1, 1, false)[0].moves[0];
+    pair<int,int> fast_move = readable_move(board.fast_engine_recommendation(1), board.size);
+    EXPECT_EQ(basic_move, fast_move) << board_file.path() << endl;
+  }
+}
+
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

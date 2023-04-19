@@ -135,12 +135,49 @@ void omp_vs_normal_benchmark(const int depth, const bool prune){
   cout << "Omp time: " << omp_time_total << endl;
 }
 
+void fast_vs_normal_benchmark(const int depth, const bool prune){
+  vector<Engine_Board> boards;
+  size_t i = 0;
+  float normal_time_total = 0, fast_time_total = 0;
+  for (const auto & board_file : std::filesystem::directory_iterator("../test/boards/")) {
+    cout << "Board " << board_file.path() << endl;
+    Engine_Board b(board_file.path());
+
+    b.engine_recommendation(depth, 1, prune);
+    b.fast_engine_recommendation(depth);
+
+    Timer t_normal;
+    b.engine_recommendation(depth, 1, prune);
+    float normal_time = t_normal.elapsed();
+
+    Timer t_fast;
+    b.fast_engine_recommendation(depth);
+    float fast_time = t_fast.elapsed();
+
+
+    fast_time_total += fast_time;
+    normal_time_total += normal_time;
+
+    cout << "Normal time: " << normal_time << endl;
+    cout << "Fast time: " << fast_time << endl;
+  }
+  cout << "Total time" << endl;
+  cout << "Normal time: " << normal_time_total << endl;
+  cout << "Fast time: " << fast_time_total << endl;
+}
+
+
+pair<int,int> rm(int i, int size) {
+  return make_pair(i / size, i % size);
+}
+
 int main() {
   // test_empty_board();
   // load_board_and_move();
   // test_engine_board();
   // rng_vs_minimax();
   // search_position();
-  omp_vs_normal_benchmark(4, true);
+  // omp_vs_normal_benchmark(4, true);
+  fast_vs_normal_benchmark(2, true);
   return 0;
 }
