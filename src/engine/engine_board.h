@@ -43,9 +43,11 @@ public:
   Engine_Board(string filename);
   Engine_Board(Engine_Board &b);
 
+  ~Engine_Board();
+
   // returns the index of board positions for the moves
   // call make_move(idx) to make one of the moves
-  vector<int> get_candidate_moves();
+  void get_candidate_moves(vector<int> &moves);
 
   // returns the evaluation of any given position
   int eval();
@@ -73,7 +75,8 @@ protected:
 
 private:
   // track critical squares
-  unordered_set<int> critical_4, critical_3;
+  // unordered_set<int> critical_4, critical_3;
+  int *critical_4, *critical_3;
 
   void update_bounds(int r, int c);
   void print_bounds();

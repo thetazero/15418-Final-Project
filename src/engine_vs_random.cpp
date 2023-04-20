@@ -36,7 +36,8 @@ void rng_vs_minimax(int depth) {
       cout << endl;
       cout << "Eval at current position: " << b.eval() << endl;
     } else {
-      auto moves = b.get_candidate_moves();
+      vector<int> moves;
+      b.get_candidate_moves(moves);
       int r = rand() % moves.size();
       b.make_move(moves[r]);
     }

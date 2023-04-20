@@ -71,8 +71,7 @@ static int game_over(int r, int c, int r_max, int c_max, board_t *board,
 static inline bool check_direction(int r, int c, int dr, int dc, int &count,
                             board_t *board, int size, int r_min, int r_max,
                             int c_min, int c_max) {
-  int start_tile =
-      board[idx(r + dr, c + dc, size)]; // the first tile in the sequence
+  int start_tile;
   for (int i = 0; i < 4; i++) {
     // move to the next tile in direction
     r += dr;
@@ -81,8 +80,11 @@ static inline bool check_direction(int r, int c, int dr, int dc, int &count,
     if (r > r_max || r < r_min || c > c_max || c < c_min) {
       return false;
     }
-
+    
     int tile = board[idx(r, c, size)];
+    if (i == 0) {
+      start_tile = tile;
+    }
 
     if (tile == 0) {
       return true;
@@ -145,8 +147,8 @@ static inline int check_5_straight(int r, int c, board_t *board, int &x_4_counts
 
   bool down_open = check_direction(r, c, 1, 0, down, board, size, r_min, r_max,
                                    c_min, c_max);
-  bool up_open =
-      check_direction(r, c, -1, 0, up, board, size, r_min, r_max, c_min, c_max);
+  bool up_open = check_direction(r, c, -1, 0, up, board, size, r_min, r_max, 
+                                c_min, c_max);
   bool right_open = check_direction(r, c, 0, 1, right, board, size, r_min,
                                     r_max, c_min, c_max);
   bool left_open = check_direction(r, c, 0, -1, left, board, size, r_min, r_max,

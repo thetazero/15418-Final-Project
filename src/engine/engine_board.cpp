@@ -26,6 +26,12 @@ Engine_Board::Engine_Board(int board_size = 19) : Board(board_size) {
   c_max = -1;
   parallel_eval = false;
   parallel_search = false;
+
+  int total = size * size;
+  critical_4 = new int[total];
+  critical_3 = new int[total];
+  memset(critical_4, 0, sizeof(int) * total);
+  memset(critical_3, 0, sizeof(int) * total);
 }
 
 Engine_Board::Engine_Board(string filename) : Board(filename) {
@@ -43,6 +49,12 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
   }
   parallel_eval = false;
   parallel_search = false;
+
+  int total = size * size;
+  critical_4 = new int[total];
+  critical_3 = new int[total];
+  memset(critical_4, 0, sizeof(int) * total);
+  memset(critical_3, 0, sizeof(int) * total);
 }
 
 Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
@@ -54,40 +66,51 @@ Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
   critical_3 = b.critical_3;
   parallel_eval = b.parallel_eval;
   parallel_search = b.parallel_search;
+
+  int total = size * size;
+  critical_4 = new int[total];
+  critical_3 = new int[total];
+  memset(critical_4, 0, sizeof(int) * total);
+  memset(critical_3, 0, sizeof(int) * total);
 }
 
-vector<int> Engine_Board::get_candidate_moves() {
+Engine_Board::~Engine_Board() {
+  delete critical_4, critical_3;
+}
+
+void Engine_Board::get_candidate_moves(vector<int> &moves) {
   // most basic: return vector of empty spots within the search space
   // smarter: first keep track of forced move squares (e.g. to stop live 4's and
   // 3's)
-  vector<int> moves;
-
+  vector<int> critical_4s, critical_3s, empties;
+  
   // if empty board, just return the center square
   if (r_max < 0) {
     moves.push_back(idx(size / 2, size / 2));
-    return moves;
+    return;
   }
 
   // first put all critical 4 and 3 squares at the front of moves
-  for (int i : critical_4) {
-    if (!board[i])
-      moves.push_back(i);
-  }
-  for (int i : critical_3) {
-    if (!board[i])
-      moves.push_back(i);
-  }
-
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       int i = idx(r, c);
-      // add empty squares that haven't already been added
-      if (board[i] == 0 && !critical_4.count(i) && !critical_3.count(i)) {
-        moves.push_back(i);
+      if (!board[i]) {
+        if (critical_4[i]) {
+          critical_4s.push_back(i);
+        }
+        else if (critical_3[i]) {
+          critical_3s.push_back(i);
+        }
+        else {
+          empties.push_back(i);
+        }
       }
     }
   }
-  return moves;
+
+  moves.insert(moves.end(), critical_4s.begin(), critical_4s.end());
+  moves.insert(moves.end(), critical_3s.begin(), critical_3s.end());
+  moves.insert(moves.end(), empties.begin(), empties.end());
 }
 
 bool Engine_Board::check_direction(int r, int c, int dr, int dc, int &count) {
@@ -139,7 +162,7 @@ int Engine_Board::process_counts(int *counts) {
 }
 
 // TODO: keep track of critical squares?
-// search 5 straight dots fomr (r, c) down the row, column, and two diagonals
+// search 5 straight dots from (r, c) down the row, column, and two diagonals
 // update counts of live 4's and live 3's for both colors
 // live 4: 4 out of 5 squares are one piece, last square empty
 // live 3: this specific pattern: [. x x x .]
@@ -214,10 +237,10 @@ int Engine_Board::check_5_straight(int r, int c, int &x_4_count,
 
   // add the the set of highest importance
   if (critical_x_4 || critical_o_4) {
-    critical_4.insert(idx(r, c));
+    critical_4[idx(r, c)] = 1;
   } else if (critical_x_3 || critical_o_3 || critical_special_o_3 ||
              critical_special_o_3) {
-    critical_3.insert(idx(r, c));
+    critical_3[idx(r, c)] = 1;
   }
 
   int counts[8] = {down,      up,       left,       right,
@@ -307,40 +330,22 @@ void Engine_Board::set_parallel_search_mode(bool parallel) {
 
 int Engine_Board::ispc_eval(int &x_4_count, int &o_4_count) {
   int total = size * size;
-  int *critical_4_mark = new int[total];
-  int *critical_3_mark = new int[total];
   int win_x = 0, win_o = 0;
-  memset(critical_4_mark, 0, total * sizeof(int));
-  memset(critical_3_mark, 0, total * sizeof(int));
 
   Timer t;
   int eval =
       ispc::eval_ispc(r_min, r_max, c_min, c_max, size, board, win_x, win_o,
-                      x_4_count, o_4_count, critical_4_mark, critical_3_mark);
+                      x_4_count, o_4_count, critical_4, critical_3);
   md.ispc_time += t.elapsed();
   if (win_x) {
     eval = GAME_OVER_EVAL;
-    delete critical_4_mark, critical_3_mark;
     return eval;
   } 
   if (win_o) {
     eval = -1 * GAME_OVER_EVAL;
-    delete critical_4_mark, critical_3_mark;
     return eval;
   }
-  // add to critical set
-  for (int r = r_min; r <= r_max; r++) {
-    for (int c = c_min; c <= c_max; c++) {
-      int i = idx(r, c);
-      if (critical_4_mark[i]) {
-        critical_4.insert(i);
-      } else if (critical_3_mark[i]) {
-        critical_3.insert(i);
-      }
-    }
-  }
 
-  delete critical_4_mark, critical_3_mark;
   return eval;
 }
 
@@ -350,9 +355,10 @@ int Engine_Board::eval() {
   // number of live 4's for x and o
   int x_4_count = 0, o_4_count = 0;
 
-  // clear critical square set
-  critical_4.clear();
-  critical_3.clear();
+  // clear critical square lists
+  int total = size * size;
+  memset(critical_4, 0, sizeof(int) * total);
+  memset(critical_3, 0, sizeof(int) * total);
 
   // if (md.eval_count < 5) {
   //   print();
@@ -388,7 +394,7 @@ int Engine_Board::eval() {
   }
 
   // should only have max 1 person have 1 or more live 4's
-  assert(!(x_4_count > 0 && o_4_count > 0));
+  // assert(!(x_4_count > 0 && o_4_count > 0));
 
   // if you have more than 1 live 4, you will win regardless of who's turn
   if (x_4_count > 1)
@@ -397,28 +403,6 @@ int Engine_Board::eval() {
     return -1 * INEVITABLE_WIN_4_EVAL;
 
   // one player has single live 4 and opponent is forced to block
-  if (x_4_count == 1) {
-
-  } else if (o_4_count == 1) {
-
-  } else { // no one has live 4
-  }
-
-  // if (x_3_count >= 1) {
-  //   if (turn == 1) { // your turn and you have at least a live 3
-  //     if (o_4_count == 0) { // if they don't have immediate live 4, you win
-  //       return INEVITABLE_WIN_3_EVAL;
-  //     }
-  //   }
-  //   else { // their turn and you have at least a live 3
-
-  //   }
-  // }
-  // if (o_3_count >= 1) {
-  //   if (x_4_count == 0 && turn == -1) {
-  //     return -1*INEVITABLE_WIN_3_EVAL;
-  //   }
-  // }
   md.eval_time += t.elapsed();
   return eval;
 }
@@ -528,7 +512,8 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   //   cout << "Eval: " << e << endl;
   //   cout << critical_4.size() << ", " << critical_3.size() << endl;
   // }
-  vector<int> moves = get_candidate_moves();
+  vector<int> moves;
+  get_candidate_moves(moves);
 
   best_move.score = isMax ? INT_MIN : INT_MAX;
 
