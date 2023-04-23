@@ -34,7 +34,7 @@ Board::Board(string filename) {
   board = new board_t[total];
   int i = 0;
   while (getline(board_file, line)) {
-    if (line.size() != (2 * size - 1)) {
+    if (line.size() < (2 * size - 1)) {
       return;
     }
 

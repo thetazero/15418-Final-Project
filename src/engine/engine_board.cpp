@@ -41,12 +41,13 @@ Engine_Board::Engine_Board(string filename) : Board(filename) {
   c_max = -1;
   // establish bounds of pieces
   for (int r = 0; r < size; r++) {
-    for (int c = 0; c < size; c++) {
-      if (board[idx(r, c)] != 0) {
+    for (int c = 0; c < size; c++) {;
+      if (board[idx(r, c)] != 0) {        
         update_bounds(r, c);
       }
     }
   }
+  
   parallel_eval = false;
   parallel_search = false;
 
@@ -387,7 +388,6 @@ int Engine_Board::eval() {
 
   // TODO: this stuff is not correct yet with the 3 counts, double counting
   // cout << "4 counts: " << x_4_count << ", " << o_4_count << endl;
-
   // if you have a live 4 and it is your turn, you will win
   if ((x_4_count > 0 && turn == 1) || (o_4_count > 0 && turn == -1)) {
     return turn * INEVITABLE_WIN_4_EVAL;
@@ -529,7 +529,10 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
       r_min = old_r_min;
       c_min = old_c_min;
       r_max = old_r_max;
-      c_max = old_c_max;
+      c_max = old_c_max; 
+      if (depth == 0) {
+        lines.push_back(MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))});
+      }
       return MinimaxResult{e, vector<pair<int, int>>(1, rc(moves[i]))};
     }
 
