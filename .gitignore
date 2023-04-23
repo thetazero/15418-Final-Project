@@ -5,7 +5,6 @@ CMakeFiles
 _deps
 build/*
 CMakeCache.txt
-boards/*
 *Makefile*
 *\.cmake
 src/Connect5_run
