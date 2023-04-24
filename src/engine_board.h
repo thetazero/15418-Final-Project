@@ -72,6 +72,8 @@ public:
   std::vector<MinimaxResult> engine_recommendation_omp(int depth, int num_lines, bool prune);
   // max speed, only returns the best move
   int fast_engine_recommendation(int depth);
+  // with omp
+  int fast_engine_recommendation_omp(int depth);
 
   int eval_count = 0;
 
@@ -115,8 +117,11 @@ private:
 
   // fast implementation of minimax that only searches for the best move
   int fast_minimax(int max_depth, int depth, bool isMax, int alpha, int beta);
+  // fast implementation of minimax that only searches for the best move, using openmp
+  int fast_minimax_omp(int max_depth, int depth, bool isMax, int alpha, int beta);
+
   // fast_minimax sets this to the best move from the root
-  int fast_root_best_move;
+  volatile int fast_root_best_move;
 };
 
 #endif

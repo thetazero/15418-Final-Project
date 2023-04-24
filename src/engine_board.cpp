@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <utility>
 
-pair<int,int> readable_move(int i, int size) {
+pair<int, int> readable_move(int i, int size) {
   return make_pair(i / size, i % size);
 }
 
@@ -613,7 +613,8 @@ Engine_Board::engine_recommendation_omp(int depth, int num_lines, bool prune) {
   return lines;
 }
 
-int Engine_Board::fast_minimax(const int max_depth, const int depth, const bool isMax, int alpha, int beta) {
+int Engine_Board::fast_minimax(const int max_depth, const int depth,
+                               const bool isMax, int alpha, int beta) {
   int e = eval();
   if (depth == max_depth || e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
     return e;
@@ -631,7 +632,6 @@ int Engine_Board::fast_minimax(const int max_depth, const int depth, const bool 
     int old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
     int res = fast_minimax(max_depth, depth + 1, !isMax, alpha, beta);
-
 
     if (isMax) {
       if (res > best_move) {
@@ -665,9 +665,72 @@ int Engine_Board::fast_minimax(const int max_depth, const int depth, const bool 
   return best_move;
 }
 
+int Engine_Board::fast_minimax_omp(const int max_depth, const int depth,
+                                   const bool isMax, volatile int alpha,
+                                   volatile int beta) {
+  int e = eval();
+  if (depth == max_depth || e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
+    return e;
+  }
+
+  vector<int> moves = get_candidate_moves();
+  volatile int best_move = isMax ? INT_MIN : INT_MAX;
+
+  volatile bool flag = false;
+
+  int move_count = moves.size();
+  omp_set_num_threads(8);
+#pragma omp parallel for schedule(dynamic) shared(flag)
+  for (int i = 0; i < move_count; i++) {
+    if (flag)
+      continue;
+    Engine_Board private_board(*this);
+    private_board.make_move(moves[i]);
+    int res;
+    if (depth <= 0) {
+      res = private_board.fast_minimax_omp(max_depth, depth + 1, !isMax, alpha,
+                                           beta);
+    } else {
+      res =
+          private_board.fast_minimax(max_depth, depth + 1, !isMax, alpha, beta);
+    }
+
+    #pragma omp critical
+    if (isMax) {
+      if (res > best_move) {
+        best_move = res;
+        if (depth == 0) {
+          fast_root_best_move = moves[i];
+        }
+      }
+      alpha = max(alpha, best_move);
+    } else {
+      if (res < best_move) {
+        best_move = res;
+        if (depth == 0) {
+          fast_root_best_move = moves[i];
+        }
+      }
+      beta = min(beta, best_move);
+    }
+
+    if (beta < alpha) {
+      // break;
+      flag = true;
+    }
+  }
+
+  return best_move;
+}
 
 int Engine_Board::fast_engine_recommendation(int depth) {
   bool isMax = turn == 1;
   fast_minimax(depth, 0, isMax, INT_MIN, INT_MAX);
+  return fast_root_best_move;
+}
+
+int Engine_Board::fast_engine_recommendation_omp(int depth) {
+  bool isMax = turn == 1;
+  fast_minimax_omp(depth, 0, isMax, INT_MIN, INT_MAX);
   return fast_root_best_move;
 }

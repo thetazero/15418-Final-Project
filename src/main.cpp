@@ -166,6 +166,34 @@ void fast_vs_normal_benchmark(const int depth, const bool prune){
   cout << "Fast time: " << fast_time_total << endl;
 }
 
+void fast_benchmark(const int depth){
+  vector<Engine_Board> boards;
+  size_t i = 0;
+  float normal_time_total = 0, fast_time_total = 0;
+  for (const auto & board_file : std::filesystem::directory_iterator("../test/boards/")) {
+    cout << "Board " << board_file.path() << endl;
+    Engine_Board b(board_file.path());
+
+    Timer t_normal;
+    b.fast_engine_recommendation(depth);
+    float normal_time = t_normal.elapsed();
+
+    Timer t_fast;
+    b.fast_engine_recommendation_omp(depth);
+    float fast_time = t_fast.elapsed();
+
+
+    fast_time_total += fast_time;
+    normal_time_total += normal_time;
+
+    cout << "Normal time: " << normal_time << endl;
+    cout << "OMP time: " << fast_time << endl;
+  }
+  cout << "Total time" << endl;
+  cout << "Normal time: " << normal_time_total << endl;
+  cout << "OMP time: " << fast_time_total << endl;
+}
+
 
 pair<int,int> rm(int i, int size) {
   return make_pair(i / size, i % size);
@@ -178,6 +206,7 @@ int main() {
   // rng_vs_minimax();
   // search_position();
   // omp_vs_normal_benchmark(4, true);
-  fast_vs_normal_benchmark(2, true);
+  // fast_vs_normal_benchmark(2, true);
+  fast_benchmark(4);
   return 0;
 }
