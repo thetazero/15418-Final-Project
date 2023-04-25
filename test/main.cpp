@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <filesystem>
 
+pair<int,int> readable_move2(int i, int size) {
+  return make_pair(i / size, i % size);
+}
 
 TEST(ENGINE_BOARD, game_over) {
   Engine_Board empty(19);
@@ -270,7 +273,31 @@ TEST(ENGINE_BOARD, fast_recommendation_consistency) {
   for (const auto & board_file : std::filesystem::directory_iterator(path)) {
     Engine_Board board(board_file.path());
     pair<int,int> basic_move = board.engine_recommendation(1, 1, false)[0].moves[0];
-    pair<int,int> fast_move = readable_move(board.fast_engine_recommendation(1), board.size);
+    pair<int,int> fast_move = readable_move2(board.fast_engine_recommendation(1), board.size);
+    EXPECT_EQ(basic_move, fast_move) << board_file.path() << endl;
+  }
+}
+
+TEST(ENGINE_BOARD, copy) {
+  string b1 = R"(
+x . . . .
+o . . . . 
+. x . . .
+. o . . .
+. . . . )";
+  Engine_Board board(b1, 'x', 5);
+  string orginal_str = board.to_string();
+  Engine_Board board_cpy(board);
+  board.make_move(0, 1);
+  EXPECT_EQ(board_cpy.to_string(), orginal_str);
+}
+
+TEST(ENGINE_BOARD, fast_omp_consistency) {
+  string path = "boards/";
+  for (const auto & board_file : std::filesystem::directory_iterator(path)) {
+    Engine_Board board(board_file.path());
+    pair<int,int> basic_move = readable_move2(board.fast_engine_recommendation_omp(3), board.size);
+    pair<int,int> fast_move = readable_move2(board.fast_engine_recommendation(3), board.size);
     EXPECT_EQ(basic_move, fast_move) << board_file.path() << endl;
   }
 }
