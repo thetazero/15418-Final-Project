@@ -53,6 +53,7 @@ public:
   int eval();
   void set_parallel_eval_mode(bool parallel);
   void set_parallel_search_mode(bool parallel);
+  void set_fast_mode(bool fast);
   
   // move at board position (r,c)
   int make_move(int r, int c);
@@ -71,7 +72,7 @@ protected:
   // bounds of search, give a buffer of 1 row/col on each side where possible
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
   int r_min, c_min, r_max, c_max;
-  bool parallel_eval, parallel_search;
+  bool parallel_eval, parallel_search, fast_mode;
 
 private:
   // track critical squares
@@ -97,6 +98,14 @@ private:
   
   MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
                         bool isMax, int alpha, int beta, bool prune);
+  
+  MinimaxResult fast_engine_recommendation(int depth);
+  // fast implementation of minimax that only searches for the best move
+  int fast_minimax(int max_depth, int depth, bool isMax, int alpha, int beta);
+  // fast implementation of minimax that only searches for the best move, using openmp
+  int fast_minimax_omp(int max_depth, int depth, bool isMax, int alpha, int beta);
+  // fast_minimax sets this to the best move from the root
+  volatile int fast_root_best_move;
 };
 
 #endif

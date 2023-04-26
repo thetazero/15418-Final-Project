@@ -162,4 +162,4 @@ void Board::print() {
 // get board size
 int Board::get_size() { return size; }
 
-Board::~Board() { delete board; }
+Board::~Board() { delete[] board; }

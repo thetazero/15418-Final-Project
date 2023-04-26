@@ -1,4 +1,4 @@
-CFLAGS := -std=c++14 -fvisibility=hidden -lpthread
+CFLAGS := -std=c++14 -fvisibility=hidden -lpthread -O2 -fopenmp
 ISPC=ispc
 ISPCTARGET=avx1-i32x8
 # ISPCTARGET=sse4

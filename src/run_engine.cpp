@@ -21,12 +21,14 @@ void print_line(MinimaxResult &line) {
   cout << endl;
 }
 
-void search_depth(Engine_Board &b, int d, bool parallel, bool prune) {
+void search_depth(Engine_Board &b, int d, bool parallel_search, bool parallel_eval, bool fast, bool prune) {
   Engine_Board b_tmp(b);
-  b_tmp.set_parallel_eval_mode(parallel);
+  b_tmp.set_parallel_eval_mode(parallel_eval);
+  b_tmp.set_parallel_search_mode(parallel_search);
+  b_tmp.set_fast_mode(fast);
   vector<MinimaxResult> lines = b_tmp.engine_recommendation(d, 3, prune);
   cout << "Depth: " << d << ", Turn: " << (b_tmp.get_turn() == 1 ? "x" : "o")
-       << " Parallel: " << parallel << endl;
+       << " Parallel Search/Eval: " << parallel_search << "/" << parallel_eval << endl;
   b_tmp.md.print();
   for (auto &line : lines) {
     print_line(line);
@@ -35,6 +37,7 @@ void search_depth(Engine_Board &b, int d, bool parallel, bool prune) {
   int eval = b_tmp.eval();
   cout << "Eval at current position: " << eval << endl;
 }
+
 
 void search_position(string file_name, bool prune) {
   Engine_Board b(file_name);
@@ -46,10 +49,13 @@ void search_position(string file_name, bool prune) {
   cout << endl;
   b.print();
   for (int d = 1; d <= MAX_DEPTH; d++) {
-    search_depth(b, d, true, prune);
-    search_depth(b, d, false, prune);
+    search_depth(b, d, false, true, false, prune);
+    search_depth(b, d, false, false, false, prune);
+    search_depth(b, d, false, true, true, prune);
+    search_depth(b, d, false, false, true, prune);
   }
 }
+
 
 int main(int argc, char *argv[]) {
   bool prune = true;
