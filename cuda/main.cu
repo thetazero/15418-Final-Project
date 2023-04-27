@@ -6,6 +6,7 @@
 
 __global__ void test(){
   printf("Hi Cuda World\n");
+  Board b(12);
 }
 
 void print_gpu() {
