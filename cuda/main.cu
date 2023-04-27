@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include "board.h"
 
 __global__ void test(){
   printf("Hi Cuda World\n");
