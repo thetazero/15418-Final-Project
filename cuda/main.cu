@@ -8,7 +8,7 @@
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
 {
-   if (code != cudaSuccess) 
+   if (code != cudaSuccess)
    {
       fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
       if (abort) exit(code);
@@ -16,17 +16,13 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
 }
 
 __global__ void test(){
-  printf("Hi Cuda World\n");
-  string b1 = R"(
-x x . . .
-o o . . .
-. . . . .
-. . . . .
-. . . . .
-  )"
-  Engine_board board(b1, 5, 'x')
-  printf("Board:\n%s\n", board.to_string().c_str())
-  int move = board.fast_engine_recomendation();
+  printf("Hello Cuda World\n");
+  printf("Test 1\n");
+  string b1 = "x x . . .\no o . . .\n. . . . .\n. . . . .\n. . . . .";
+  printf("Test 2\n");
+  Engine_Board board(b1, 5, 'x');
+  printf("Board:\n%s\n", board.to_string().c_str());
+  int move = board.fast_engine_recommendation(3);
   printf("Move: %d\n", move);
 }
 
