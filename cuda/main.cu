@@ -5,6 +5,16 @@
 #include "board.h"
 #include "engine_board.h"
 
+#define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
+inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
+{
+   if (code != cudaSuccess) 
+   {
+      fprintf(stderr,"GPUassert: %s %s %d\n", cudaGetErrorString(code), file, line);
+      if (abort) exit(code);
+   }
+}
+
 __global__ void test(){
   printf("Hi Cuda World\n");
   string b1 = R"(
@@ -40,6 +50,7 @@ void print_gpu() {
 int main(int argc, char** argv )
 {
    test<<<1,1>>>();
+   gpuErrchk(cudaPeekAtLastError());
    cudaDeviceSynchronize();
    print_gpu();
    return 0;
