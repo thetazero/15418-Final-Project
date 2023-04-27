@@ -25,6 +25,7 @@ o o . . .
 . . . . .
   )"
   Engine_board board(b1, 5, 'x')
+  printf("Board:\n%s\n", board.to_string().c_str())
   int move = board.fast_engine_recomendation();
   printf("Move: %d\n", move);
 }
