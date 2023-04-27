@@ -3,10 +3,20 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include "board.h"
+#include "engine_board.h"
 
 __global__ void test(){
   printf("Hi Cuda World\n");
-  Board b(12);
+  string b1 = R"(
+x x . . .
+o o . . .
+. . . . .
+. . . . .
+. . . . .
+  )"
+  Engine_board board(b1, 5, 'x')
+  int move = board.fast_engine_recomendation();
+  printf("Move: %d\n", move);
 }
 
 void print_gpu() {
