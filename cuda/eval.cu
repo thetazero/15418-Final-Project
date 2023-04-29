@@ -1,4 +1,7 @@
 __device__ __inline__ 
+int idx(int r, int c, int size) { return r * size + c; }
+
+__device__ __inline__ 
 void update_scratch(int state, int i, char *x_scratch, char *o_scratch) {
   if (state == 0) return;
   char *scratch = state > 0 ? x_scratch : o_scratch;
