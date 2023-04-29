@@ -52,7 +52,6 @@ void test_idx() {
   assert(idx_wrapper(0, 0, 5) == 0);
   assert(idx_wrapper(0, 7, 12) == 7);
   assert(idx_wrapper(8, 3, 10) == 83);
-  printf("idx_tests sucessful\n");
 }
 
 void test_scan_horizontal() {
@@ -77,10 +76,10 @@ void test_scan_horizontal() {
     assert(x_scratch[i] == expected_x_scratch[i]);
     assert(o_scratch[i] == expected_o_scratch[i]);
   }
-  printf("scan_horizontal_tests sucessful\n");
 }
 
 int main() {
   test_idx();
+  test_scan_horizontal();
   return 0;
 }
