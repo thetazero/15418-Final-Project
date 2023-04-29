@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
+#include "eval.cuh"
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
@@ -50,5 +51,7 @@ int main(int argc, char** argv )
    gpuErrchk(cudaPeekAtLastError());
    cudaDeviceSynchronize();
    print_gpu();
+
+   hello_world<<3,3>>();
    return 0;
 }

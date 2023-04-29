@@ -3,6 +3,8 @@
 #include <cuda.h>
 #include <cuda_runtime.h>
 #include <stdio.h>
+#include <iostream>
+using namespace std;
 
 __global__ void idx_kernel(int *ans, int r, int c, int size) {
   *ans = idx(r, c, size);
@@ -72,6 +74,7 @@ void test_scan_horizontal() {
                                 0, 0, 0};
   scan_horizontal_wrapper(3, board, x_scratch, o_scratch, 1);
   for (int i = 0; i < 9; i++) {
+    cout << board[i] << (int)x_scratch[i] << (int)o_scratch[i] << endl;
     assert(board[i] == expected_board[i]);
     assert(x_scratch[i] == expected_x_scratch[i]);
     assert(o_scratch[i] == expected_o_scratch[i]);
