@@ -31,13 +31,17 @@ char *to_host(char *d_arr, int size) {
   return h_arr;
 }
 
+__global__ void scan_horizontal_kernel(int size, char *board, char *x_scratch, char *o_scratch, int dc){
+  scan_horizontal(size, board, x_scratch, o_scratch, dc);
+}
+
 void scan_horizontal_wrapper(int size, char *board, char *x_scratch,
                              char *o_scratch, int dc) {
   size_t board_mem_size = size * size * sizeof(char);
   char *d_board = to_device(board, board_mem_size);
   char *d_x_scratch = to_device(x_scratch, board_mem_size);
   char *d_o_scratch = to_device(o_scratch, board_mem_size);
-  scan_horizontal<<<1, 1>>>(size, d_board, d_x_scratch, d_o_scratch, dc);
+  scan_horizontal_kernel<<<1, 1>>>(size, d_board, d_x_scratch, d_o_scratch, dc);
   cudaMemcpy(board, d_board, board_mem_size, cudaMemcpyDeviceToHost);
   cudaMemcpy(x_scratch, d_x_scratch, board_mem_size, cudaMemcpyDeviceToHost);
   cudaMemcpy(o_scratch, d_o_scratch, board_mem_size, cudaMemcpyDeviceToHost);
@@ -52,19 +56,19 @@ void test_idx() {
 }
 
 void test_scan_horizontal() {
-  char board[9] = {'x', 'x', '.', 
+  char board[9] = {'x', 'x', '.',
                    '.', 'o', '.',
                    'x', '.', 'o'};
   char x_scratch[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   char o_scratch[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   scan_horizontal_wrapper(3, board, x_scratch, o_scratch, 1);
-  char expected_board[9] = {'x', 'x', '.', 
+  char expected_board[9] = {'x', 'x', '.',
                             '.', 'o', '.',
                             'x', '.', 'o'};
-  char expected_x_scratch[9] = {0, 0, 2, 
+  char expected_x_scratch[9] = {0, 0, 2,
                                 0, 0, 0,
                                 0, 1, 0};
-  char expected_o_scratch[9] = {0, 0, 0, 
+  char expected_o_scratch[9] = {0, 0, 0,
                                 0, 0, 1,
                                 0, 0, 0};
   scan_horizontal_wrapper(3, board, x_scratch, o_scratch, 1);

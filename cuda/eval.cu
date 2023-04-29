@@ -1,7 +1,7 @@
-__device__ __inline__ 
+__device__ __inline__
 int idx(int r, int c, int size) { return r * size + c; }
 
-__device__ __inline__ 
+__device__ __inline__
 void update_scratch(int state, int i, char *x_scratch, char *o_scratch) {
   if (state == 0) return;
   char *scratch = state > 0 ? x_scratch : o_scratch;
@@ -31,8 +31,8 @@ void scan_horizontal(int size, char *board, char *x_scratch, char *o_scratch, in
   int state = 0;
   // 0 = empty, +n = n x's in a row, -n = n o's in a row
   int r0 = 0;
-  int c0 = dr > 0 ? 0 : size-1;
-  int c_terminate = dr > 0 ? size : -1; 
+  int c0 = dc > 0 ? 0 : size-1;
+  int c_terminate = dc > 0 ? size : -1;
   for (int r = r0; r < size; r++) {
     for (int c = c0; c != c_terminate; c+=dc) {
       state = update_state(r, c, size, state, board, x_scratch, o_scratch);
