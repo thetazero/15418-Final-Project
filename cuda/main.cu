@@ -2,8 +2,6 @@
 #include <assert.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "board.h"
-#include "engine_board.h"
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
@@ -15,6 +13,7 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
+/*
 __global__ void test(){
   printf("Hello Cuda World\n");
   printf("Test 1\n");
@@ -25,6 +24,7 @@ __global__ void test(){
   int move = board.fast_engine_recommendation(3);
   printf("Move: %d\n", move);
 }
+*/
 
 void print_gpu() {
   int nDevices = 0;
@@ -46,7 +46,7 @@ void print_gpu() {
 
 int main(int argc, char** argv )
 {
-   test<<<1,1>>>();
+   //test<<<1,1>>>();
    gpuErrchk(cudaPeekAtLastError());
    cudaDeviceSynchronize();
    print_gpu();

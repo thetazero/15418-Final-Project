@@ -11,3 +11,5 @@ boards/*
 src/Connect5_run
 src/libConnect5_lib.a
 test/Connect5_test
+cuda/cuda_tests
+cuda/cuda_connect
