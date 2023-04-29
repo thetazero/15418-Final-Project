@@ -14,19 +14,6 @@ inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=t
    }
 }
 
-/*
-__global__ void test(){
-  printf("Hello Cuda World\n");
-  printf("Test 1\n");
-  string b1 = "x x . . .\no o . . .\n. . . . .\n. . . . .\n. . . . .";
-  printf("Test 2\n");
-  Engine_Board board(b1, 5, 'x');
-  printf("Board:\n%s\n", board.to_string().c_str());
-  int move = board.fast_engine_recommendation(3);
-  printf("Move: %d\n", move);
-}
-*/
-
 void print_gpu() {
   int nDevices = 0;
   cudaGetDeviceCount(&nDevices);
@@ -45,13 +32,16 @@ void print_gpu() {
   }
 }
 
+__global__ void hello_world() {
+   printf("Hello from block %d, thread %d\n", blockIdx.x, threadIdx.x);
+}
+
 int main(int argc, char** argv )
 {
-   //test<<<1,1>>>();
-   gpuErrchk(cudaPeekAtLastError());
    cudaDeviceSynchronize();
    print_gpu();
 
-   hello_world<<3,3>>();
+   hello_world<<<3,3>>>();
+   cudaDeviceSynchronize();
    return 0;
 }

@@ -56,13 +56,26 @@ void test_idx() {
   assert(idx_wrapper(8, 3, 10) == 83);
 }
 
+void test_scan_horizontal_helper(string name, int size, char *board, char *x_scratch, char *o_scratch,
+                                 char *expected_board, char *expected_x_scratch,
+                                 char *expected_o_scratch, int dc) {
+  cout << "Running test: " << name << endl;
+  scan_horizontal_wrapper(size, board, x_scratch, o_scratch, dc);
+  for (int i = 0; i < size * size; i++) {
+    cout << "Got: " << board[i] << (int)x_scratch[i] << (int)o_scratch[i] << endl;
+    cout << "Expect: " << expected_board[i] << (int)expected_x_scratch[i] << (int)expected_o_scratch[i] << endl;
+    assert(board[i] == expected_board[i]);
+    assert(x_scratch[i] == expected_x_scratch[i]);
+    assert(o_scratch[i] == expected_o_scratch[i]);
+  }
+}
+
 void test_scan_horizontal() {
   char board[9] = {'x', 'x', '.',
                    '.', 'o', '.',
                    'x', '.', 'o'};
   char x_scratch[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
   char o_scratch[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
-  scan_horizontal_wrapper(3, board, x_scratch, o_scratch, 1);
   char expected_board[9] = {'x', 'x', '.',
                             '.', 'o', '.',
                             'x', '.', 'o'};
@@ -72,13 +85,8 @@ void test_scan_horizontal() {
   char expected_o_scratch[9] = {0, 0, 0,
                                 0, 0, 1,
                                 0, 0, 0};
-  scan_horizontal_wrapper(3, board, x_scratch, o_scratch, 1);
-  for (int i = 0; i < 9; i++) {
-    cout << board[i] << (int)x_scratch[i] << (int)o_scratch[i] << endl;
-    assert(board[i] == expected_board[i]);
-    assert(x_scratch[i] == expected_x_scratch[i]);
-    assert(o_scratch[i] == expected_o_scratch[i]);
-  }
+  test_scan_horizontal_helper("scan right", 3, board, x_scratch, o_scratch,
+    expected_board, expected_x_scratch, expected_o_scratch, 1);
 }
 
 int main() {

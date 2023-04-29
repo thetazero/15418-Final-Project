@@ -1,3 +1,7 @@
+#include <cuda.h>
+#include <cuda_runtime.h>
+#include <stdio.h>
+
 #ifndef CUDA_EVAL
 #define CUDA_EVAL
 
@@ -16,7 +20,6 @@ __device__ __inline__
 int update_state(int r, int c, int size, int state, char *board, char *x_scratch, char *o_scratch) {
   int i = idx(r, c, size);
   if (board[i] == '.') {
-    printf("State is now %d\n", state);
     update_scratch(state, i, x_scratch, o_scratch);
   } else {
     bool new_x = board[i] == 'x';
@@ -28,6 +31,7 @@ int update_state(int r, int c, int size, int state, char *board, char *x_scratch
       state += dir;
     }
   }
+  return state;
 }
 
 __device__ __inline__
@@ -43,10 +47,6 @@ void scan_horizontal(int size, char *board, char *x_scratch, char *o_scratch, in
     }
     state = 0;
   }
-}
-
-__global__ void hello_world() {
-   printf("Hello from block %d, thread %d\n", blockIdx.x, threadIdx.x);
 }
 
 #endif
