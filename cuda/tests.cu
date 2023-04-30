@@ -49,7 +49,7 @@ void scan_horizontal_wrapper(int size, char *board, char *x_scratch,
   cudaMemcpy(o_scratch, d_o_scratch, board_mem_size, cudaMemcpyDeviceToHost);
 }
 
-__global__  
+__global__
 void scan_vertical_kernel(int size, char *board, char *x_scratch, char *o_scratch, int dr){
   scan_vertical(size, board, x_scratch, o_scratch, dr);
 }
@@ -136,11 +136,11 @@ void test_scan_vertical() {
   test_scan_helper("scan down", 3, board, x_scratch, o_scratch,
     expected_board, expected_x_scratch, expected_o_scratch, 1, 0);
 
-  char e_xs[9] = {0, 0, 0, 
-                  1, 0, 0, 
+  char e_xs[9] = {0, 0, 0,
+                  1, 0, 0,
                   0, 0, 0};
-  char e_os[9] = {0, 0, 0, 
-                  0, 0, 1, 
+  char e_os[9] = {0, 0, 0,
+                  0, 0, 1,
                   0, 1, 0};
   // scan same board with previous scratch but from left
   test_scan_helper("scan up", 3, board, x_scratch, o_scratch,
