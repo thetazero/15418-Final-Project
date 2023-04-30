@@ -21,6 +21,7 @@ int update_state(int r, int c, int size, int state, char *board, char *x_scratch
   int i = idx(r, c, size);
   if (board[i] == '.') {
     update_scratch(state, i, x_scratch, o_scratch);
+    state = 0;
   } else {
     bool new_x = board[i] == 'x';
     bool old_x = state >= 1;
@@ -51,11 +52,12 @@ void scan_horizontal(int size, char *board, char *x_scratch, char *o_scratch, in
 
 __device__ __inline__
 void scan_vertical(int size, char *board, char *x_scratch, char *o_scratch, int dr) {
+  int state = 0;
   int r0 = dr > 0 ? 0 : size-1;
   int c0 = 0;
   int r_terminate = dr > 0 ? size : -1;
   for (int c = c0; c < size; c++) {
-    for (int r = r0; r != r_terminate; r+dr) {
+    for (int r = r0; r != r_terminate; r+=dr) {
       state = update_state(r, c, size, state, board, x_scratch, o_scratch);
     }
     state = 0;
