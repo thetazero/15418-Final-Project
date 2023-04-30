@@ -5,9 +5,14 @@
 #ifndef CUDA_EVAL
 #define CUDA_EVAL
 
+// Get index of cell at row r and column c in a board of size size
 __device__ __inline__
 int idx(int r, int c, int size) { return r * size + c; }
 
+// Given the current state, (where 0 = empty, +n = n x's in a row, -n = n o's in a row)
+// and the index of a cell, if the cell is empty, update the scratch array
+// The scratch arrays are used to keep track of the longest streak of x's and o's
+// adjacent to each empty cell
 __device__ __inline__
 void update_scratch(int state, int i, char *x_scratch, char *o_scratch) {
   if (state == 0) return;
@@ -16,6 +21,11 @@ void update_scratch(int state, int i, char *x_scratch, char *o_scratch) {
   scratch[i] = max(scratch[i], state);
 }
 
+/* Given the current state, (where 0 = empty, +n = n x's in a row, -n = n o's in a row)
+ *  Process the cell at row r and column c in a board of size size
+ * If the cell is empty, update the scratch array
+ * Otherwise, update the state to keep track of the streak of x's or o's in the current direction
+*/
 __device__ __inline__
 int update_state(int r, int c, int size, int state, char *board, char *x_scratch, char *o_scratch) {
   int i = idx(r, c, size);
@@ -34,6 +44,9 @@ int update_state(int r, int c, int size, int state, char *board, char *x_scratch
   return state;
 }
 
+/* Scan accross the board horizontaly (dc indicates direction.
+ * Update the scratch arrays for each empty cell, to keep track of the longest streak of x's and o's
+*/
 __device__ __inline__
 void scan_horizontal(int size, char *board, char *x_scratch, char *o_scratch, int dc) {
   int state = 0;
@@ -49,6 +62,9 @@ void scan_horizontal(int size, char *board, char *x_scratch, char *o_scratch, in
   }
 }
 
+/* Scan accross the board vertically (dr indicates direction).
+ * Update the scratch arrays for each empty cell, to keep track of the longest streak of x's and o's
+*/
 __device__ __inline__
 void scan_vertical(int size, char *board, char *x_scratch, char *o_scratch, int dr) {
   int r0 = dr > 0 ? 0 : size-1;
