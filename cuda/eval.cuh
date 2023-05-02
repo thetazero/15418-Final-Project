@@ -145,12 +145,43 @@ int score(char x, char o) {
 }
 
 __device__ __inline__ 
-eval(int size, char *board, char *x_scratch, char *o_scratch, int *eval) {
+int eval(int size, char *board, char *x_scratch, char *o_scratch) {
   scan_all(size, board, x_scratch, o_scratch);
   int eval = 0;
   for (int i = 0; i < size * size; i++) {
     eval += score(x_scratch[i], o_scratch[i]);
   }
+  return eval;
+}
+
+__global__
+eval_kernel(int size, char *boards, char *x_scratchs, char *o_scratchs, int *evals_h, int n) {
+  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t board_size = size * size;
+  if (i < n) {
+    eval[i] = eval(size, &board[i * board_size], &x_scratch[i * board_size], o_scratch[i * board_size]);
+  }
+}
+
+void eval_wrapper(int size, char *boards_h, int *evals_h, int n) {
+  size_t board_size = size * size;
+  o_scratchs_h = new char[board_size * n];
+  x_scratchs_h = new char[board_size * n];
+
+  char *boards_d, *x_scratchs_d, *o_scratchs_d;
+  int *evals_d;
+  cudaMalloc(&boards_d, board_size * n);
+  cudaMalloc(&x_scratchs_d, board_size * n);
+  cudaMalloc(&o_scratchs_d, board_size * n);
+  cudaMalloc(&evals_d, n);
+
+  cudaMemcpy(boards_d, boards_h, board_size * n, cudaMemcpyHostToDevice);
+  cudaMemset(x_scratchs_d, 0, board_size * n);
+  cudaMemset(o_scratchs_d, 0, board_size * n);
+
+  eval_kernel<<<(n + 255) / 256, 256>>>(size, boards_d, x_scratchs_d, o_scratchs_d, evals, n);
+
+  cudaMemcpy(evals_h, evals_d, n * sizeof(int), cudaMemcpyDeviceToHost);
 }
 
 #endif
