@@ -170,6 +170,7 @@ void test_scan_all_helper(string name, int size, char *board, char *x_scratch, c
   cout << "Running test: " << name << endl;
   scan_all_wrapper(size, board, x_scratch, o_scratch);
   for (int i = 0; i < size * size; i++) {
+    cout << i << endl;
     cout << "Got: " << board[i] << (int)x_scratch[i] << (int)o_scratch[i] << endl;
     cout << "Expect: " << expected_board[i] << (int)expected_x_scratch[i] << (int)expected_o_scratch[i] << endl;
     assert(board[i] == expected_board[i]);
@@ -179,34 +180,33 @@ void test_scan_all_helper(string name, int size, char *board, char *x_scratch, c
 }
 
 void test_scan_all() {
-  char b[9] = {'x', 'x', '.', '.',
+  size_t s = 16;
+  char b[s] = {'x', 'x', '.', '.',
                '.', 'o', '.', 'o',
-               'x', '.', 'o', 'x'
+               'x', '.', 'o', 'x',
                'x', '.', 'o', '.'};
-  char xs[9] = {0, 0, 0, 0,
+  char xs[s] = {0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0};
-  char os[9] = {0, 0, 0, 0,
+  char os[s] = {0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0,
                 0, 0, 0, 0};
-  char e_b[9] = {'x', 'x', '.', '.',
+  char e_b[s] = {'x', 'x', '.', '.',
                  '.', 'o', '.', 'o',
-                 'x', '.', 'o', 'x'
+                 'x', '.', 'o', 'x',
                  'x', '.', 'o', '.'};
-  char xs[9] = {0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0};
-  char os[9] = {0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0,
-                0, 0, 0, 0};
-  test_scan_helper("scan down", 3, b, xs, os,
+  char e_xs[s] = {0, 0, 2, 0,
+                  2, 0, 1, 0,
+                  0, 1, 0, 0,
+                  0, 1, 0, 1};
+  char e_os[s] = {0, 0, 1, 1,
+                  1, 0, 2, 0,
+                  0, 1, 0, 0,
+                  0, 2, 0, 2};
+  test_scan_all_helper("scan all", 4, b, xs, os,
     e_b, e_xs, e_os);
-
-
 }
 
 int main() {
