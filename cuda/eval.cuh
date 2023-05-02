@@ -114,6 +114,9 @@ void scan_diagonal(int size, char *board, char *x_scratch, char *o_scratch, int 
   }
 }
 
+// Note that scan all is currently incorrect as it fails to count
+// xx.x as 3 x's in a row, and instead counts it as 2 x's in a row
+// This is an issue for every direction.
 __device__ __inline__
 void scan_all(int size, char *board, char *x_scratch, char *o_scratch) {
   scan_horizontal(size, board, x_scratch, o_scratch, 1);
@@ -124,6 +127,28 @@ void scan_all(int size, char *board, char *x_scratch, char *o_scratch) {
   scan_diagonal(size, board, x_scratch, o_scratch, 1, -1);
   scan_diagonal(size, board, x_scratch, o_scratch, -1, 1);
   scan_diagonal(size, board, x_scratch, o_scratch, -1, -1);
+}
+
+__device__ __inline__
+int sign(int x) {
+  if (x >= 0)
+    return 1; 
+  return -1;
+}
+
+__device__ __inline__
+int score(char x, char o) {
+  int diff = x - o;
+  return sign(diff) * (diff * diff);
+}
+
+__device__ __inline__ 
+eval(int size, char *board, char *x_scratch, char *o_scratch, int *eval) {
+  scan_all(size, board, x_scratch, o_scratch);
+  int eval = 0;
+  for (int i = 0; i < size * size; i++) {
+    eval += score(x_scratch[i], o_scratch[i]);
+  }
 }
 
 #endif
