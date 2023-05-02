@@ -123,12 +123,15 @@ __device__ __inline__
 void scan_all(int size, char *board, char *x_scratch, char *o_scratch) {
   scan_horizontal(size, board, x_scratch, o_scratch, 1);
   scan_horizontal(size, board, x_scratch, o_scratch, -1);
+
   scan_vertical(size, board, x_scratch, o_scratch, 1);
   scan_vertical(size, board, x_scratch, o_scratch, -1);
+
   scan_diagonal(size, board, x_scratch, o_scratch, 1, 1);
+  scan_diagonal(size, board, x_scratch, o_scratch, -1, -1);
+
   scan_diagonal(size, board, x_scratch, o_scratch, 1, -1);
   scan_diagonal(size, board, x_scratch, o_scratch, -1, 1);
-  scan_diagonal(size, board, x_scratch, o_scratch, -1, -1);
 }
 
 __device__ __inline__
