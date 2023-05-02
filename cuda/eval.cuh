@@ -84,30 +84,32 @@ __device__ __inline__
 void scan_diagonal(int size, char *board, char *x_scratch, char *o_scratch, int dr, int dc) {
   int state = 0;
   if (dr == 1 && dc == -1) {
-    for (let d = 0; d < 2 * size - 1; d++) {
-      for (let i = max(d - size + 1, 0); i <= d && i < size; i++) {
-        state = update_state(r, c, size, state, board, x_scratch, o_scratch);
+    for (int d = 0; d < 2 * size - 1; d++) {
+      for (int i = max(d - size + 1, 0); i <= d && i < size; i++) {
+        printf("%d,%d: %d\n", i, d-i, state);
+        state = update_state(i, d-i, size, state, board, x_scratch, o_scratch);
       }
       state = 0;
     }
   } else if (dr == 1 && dc == 1) {
-    for (let d = -size + 1; d < size; d++) {
-      for (let i = max(0, d); i < d + size && i < size; i++) {
-        state = update_state(r, c, size, state, board, x_scratch, o_scratch);
+    for (int d = -size + 1; d < size; d++) {
+      for (int i = max(0, d); i < d + size && i < size; i++) {
+        state = update_state(i, i-d, size, state, board, x_scratch, o_scratch);
+        // printf("%d,%d: %d\n", i, d+i, state);
       }
       state = 0;
     }
   } else if (dr == -1 && dc == 1) {
-    for (let d = -size + 1; d < size; d++) {
-      for (let i = min(d + size, size)-1; i >= max(0, d); i--) {
-        state = update_state(r, c, size, state, board, x_scratch, o_scratch);
+    for (int d = -size + 1; d < size; d++) {
+      for (int i = min(d + size, size)-1; i >= max(0, d); i--) {
+        state = update_state(i, i-d, size, state, board, x_scratch, o_scratch);
       }
       state = 0;
     }
   } else { // dr == -1, dc == -1
-    for (let d = -size + 1; d < size; d++) {
-      for (let i = min(d + size, size)-1; i >= max(0, d); i--) {
-        state = update_state(r, c, size, state, board, x_scratch, o_scratch);
+    for (int d = -size + 1; d < size; d++) {
+      for (int i = min(d + size, size)-1; i >= max(0, d); i--) {
+        state = update_state(i, i-d, size, state, board, x_scratch, o_scratch);
       }
       state = 0;
    }
