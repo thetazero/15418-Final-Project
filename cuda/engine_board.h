@@ -39,7 +39,7 @@ public:
   int undo_move(int i);
 
   int game_over();
-  int fast_engine_recommendation(int depth);
+  int cuda_recommendation(int depth);
   bool in_bounds(int r, int c);
 
   // bounds of search, give a buffer of 1 row/col on each side where possible
@@ -54,10 +54,8 @@ private:
 
   int game_over(int r, int c);
   // check for 5 in a row from (r,c) in rows, cols, diags
-  // also check for live 4's and 3's
-  // fast implementation of minimax that only searches for the best move
-  int fast_minimax(int max_depth, int depth, bool isMax, int alpha, int beta);
-  // fast implementation of minimax that only searches for the best move, using openmp
+  int cuda_minimax(int max_depth, int depth, bool isMax, int *evals, int *i);
+  int cuda_minimax_stage(int max_depth, int depth, bool isMax, char *boards, int *evals, int *i);
 
   // fast_minimax sets this to the best move from the root
   volatile int fast_root_best_move;
