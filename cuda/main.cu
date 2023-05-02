@@ -43,14 +43,14 @@ int main(int argc, char** argv )
    cudaDeviceSynchronize();
 
   string easy_win = R"(
-x o . . . 
+x o . . .
 x o . . .
 x o . . .
 x o . . .
 . . . . .)";
   Engine_Board board(easy_win, 'x', 5);
 
-   int move = board.cuda_recomendation(1);
+   int move = board.cuda_recommendation(1);
    cout << "move: " << move << endl;
    return 0;
 }

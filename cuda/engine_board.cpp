@@ -1,5 +1,4 @@
 #include "engine_board.h"
-#include "timing.h"
 #include <algorithm> // std::reverse
 #include <cassert>
 #include <climits>
@@ -58,8 +57,6 @@ Engine_Board::Engine_Board(Engine_Board &b) : Board(b) {
   c_min = b.c_min;
   r_max = b.r_max;
   c_max = b.c_max;
-  critical_4 = b.critical_4;
-  critical_3 = b.critical_3;
 }
 
 vector<int> Engine_Board::get_candidate_moves() {
@@ -74,21 +71,10 @@ vector<int> Engine_Board::get_candidate_moves() {
     return moves;
   }
 
-  // first put all critical 4 and 3 squares at the front of moves
-  for (int i : critical_4) {
-    if (!board[i])
-      moves.push_back(i);
-  }
-  for (int i : critical_3) {
-    if (!board[i])
-      moves.push_back(i);
-  }
-
   for (int r = r_min; r <= r_max; r++) {
     for (int c = c_min; c <= c_max; c++) {
       int i = idx(r, c);
-      // add empty squares that haven't already been added
-      if (board[i] == 0 && !critical_4.count(i) && !critical_3.count(i)) {
+      if (board[i] == 0) {
         moves.push_back(i);
       }
     }
@@ -194,7 +180,7 @@ void Engine_Board::print_bounds() {
        << "(" << (int)r_max << ", " << (int)c_max << ")\n";
 }
 
-int Engine_Board::cuda_recomendation(const int max_depth) {
+int Engine_Board::cuda_recommendation(int max_depth) {
   size_t board_mem_size = size * size;
   size_t potential_boards = 1;
   size_t max_board_width = max_depth * 2 + 1;
@@ -204,25 +190,27 @@ int Engine_Board::cuda_recomendation(const int max_depth) {
   char *boards = new char[potential_boards * board_mem_size];
 
   int i = 0;
-  cuda_minimax_stage(max_depth, 0, true, boards, &i);
+  bool isMax = turn == 1;
+
+  cuda_minimax_stage(max_depth, 0, isMax, boards, &i);
   int *evals = new int[potential_boards];
 
   eval_wrapper(size, boards, evals, potential_boards);
 
-  cuda_minimax(max_depth, 0, true, boards, &i);
+  cuda_minimax(max_depth, 0, isMax, evals, &i);
   return fast_root_best_move;
 }
 
-void Engine_Board::cuda_minimax_stage(const int max_depth, const int depth,
-                                      const bool isMax, char *boards, int *i, const int BOARD_MEM_SIZE) {
+void Engine_Board::cuda_minimax_stage(int max_depth, int depth,
+                                      bool isMax, char *boards, int *board_idx) {
   if (depth == max_depth) {
-    size_t board_idx = *i * size * size;
+    size_t board_offset = *board_idx * size * size;
     for (int r = 0; r < size; r++) {
       for (int c = 0; c < size; c++) {
-        boards[board_idx + idx(r, c)] = board[idx(r, c)];
+        boards[board_offset + idx(r, c)] = board[idx(r, c)];
       }
     }
-    *i = *i + 1;
+    *board_idx = *board_idx + 1;
     return;
   }
   vector<int> moves = get_candidate_moves();
@@ -232,7 +220,7 @@ void Engine_Board::cuda_minimax_stage(const int max_depth, const int depth,
     int old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
 
-    int res = cuda_minimax_stage(max_depth, depth + 1, !isMax, alpha, beta);
+    cuda_minimax_stage(max_depth, depth + 1, !isMax, boards, board_idx);
 
     undo_move(moves[i]);
     r_min = old_r_min;
@@ -243,13 +231,14 @@ void Engine_Board::cuda_minimax_stage(const int max_depth, const int depth,
 }
 
 int Engine_Board::cuda_minimax(const int max_depth, const int depth,
-                               const bool isMax, int *evals, int *i) {
+                               const bool isMax, int *evals, int *eval_idx) {
   if (game_over() != 0) {
     return game_over();
   }
   if (depth == max_depth) {
-    *i = *i + 1;
-    return evals[i - 1];
+    int e = evals[*eval_idx];
+    *eval_idx = *eval_idx + 1;
+    return e;
   }
 
   vector<int> moves = get_candidate_moves();
@@ -259,7 +248,7 @@ int Engine_Board::cuda_minimax(const int max_depth, const int depth,
     int old_r_min = r_min, old_c_min = c_min;
     int old_r_max = r_max, old_c_max = c_max;
     make_move(moves[i]);
-    int res = fast_minimax(max_depth, depth + 1, !isMax, alpha, beta);
+    int res = cuda_minimax(max_depth, depth + 1, !isMax, evals, eval_idx);
 
     if (isMax) {
       if (res > best_move) {

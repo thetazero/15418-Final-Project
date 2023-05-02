@@ -55,7 +55,7 @@ private:
   int game_over(int r, int c);
   // check for 5 in a row from (r,c) in rows, cols, diags
   int cuda_minimax(int max_depth, int depth, bool isMax, int *evals, int *i);
-  int cuda_minimax_stage(int max_depth, int depth, bool isMax, char *boards, int *evals, int *i);
+  void cuda_minimax_stage(int max_depth, int depth, bool isMax, char *boards, int *i);
 
   // fast_minimax sets this to the best move from the root
   volatile int fast_root_best_move;
