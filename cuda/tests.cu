@@ -148,9 +148,71 @@ void test_scan_vertical() {
 
 }
 
+__global__
+void scan_all_kernel(int size, char *board, char *x_scratch, char *o_scratch) {
+  scan_all(size, board, x_scratch, o_scratch);
+}
+
+void scan_all_wrapper(int size, char *board, char *x_scratch, char *o_scratch){
+  size_t board_mem_size = size * size * sizeof(char);
+  char *d_board = to_device(board, board_mem_size);
+  char *d_x_scratch = to_device(x_scratch, board_mem_size);
+  char *d_o_scratch = to_device(o_scratch, board_mem_size);
+  scan_all_kernel<<<1, 1>>>(size, d_board, d_x_scratch, d_o_scratch);
+  cudaMemcpy(board, d_board, board_mem_size, cudaMemcpyDeviceToHost);
+  cudaMemcpy(x_scratch, d_x_scratch, board_mem_size, cudaMemcpyDeviceToHost);
+  cudaMemcpy(o_scratch, d_o_scratch, board_mem_size, cudaMemcpyDeviceToHost);
+}
+
+void test_scan_all_helper(string name, int size, char *board, char *x_scratch, char *o_scratch,
+                                 char *expected_board, char *expected_x_scratch,
+                                 char *expected_o_scratch) {
+  cout << "Running test: " << name << endl;
+  scan_all_wrapper(size, board, x_scratch, o_scratch);
+  for (int i = 0; i < size * size; i++) {
+    cout << "Got: " << board[i] << (int)x_scratch[i] << (int)o_scratch[i] << endl;
+    cout << "Expect: " << expected_board[i] << (int)expected_x_scratch[i] << (int)expected_o_scratch[i] << endl;
+    assert(board[i] == expected_board[i]);
+    assert(x_scratch[i] == expected_x_scratch[i]);
+    assert(o_scratch[i] == expected_o_scratch[i]);
+  }
+}
+
+void test_scan_all() {
+  char b[9] = {'x', 'x', '.', '.',
+               '.', 'o', '.', 'o',
+               'x', '.', 'o', 'x'
+               'x', '.', 'o', '.'};
+  char xs[9] = {0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0};
+  char os[9] = {0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0};
+  char e_b[9] = {'x', 'x', '.', '.',
+                 '.', 'o', '.', 'o',
+                 'x', '.', 'o', 'x'
+                 'x', '.', 'o', '.'};
+  char xs[9] = {0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0};
+  char os[9] = {0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0,
+                0, 0, 0, 0};
+  test_scan_helper("scan down", 3, b, xs, os,
+    e_b, e_xs, e_os);
+
+
+}
+
 int main() {
   test_idx();
   test_scan_horizontal();
   test_scan_vertical();
+  test_scan_all();
   return 0;
 }
