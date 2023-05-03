@@ -2,11 +2,17 @@ set(BINARY ${CMAKE_PROJECT_NAME})
 
 file(GLOB_RECURSE SOURCES LIST_DIRECTORIES true *.h *.cpp)
 
+set(LIB_SOURCES
+    board.h board.cpp
+    engine_board.h engine_board.cpp
+    timing.h
+)
+
 set(SOURCES ${SOURCES})
 
 add_executable(${BINARY}_run ${SOURCES})
 
-add_library(${BINARY}_lib STATIC ${SOURCES})
+add_library(${BINARY}_lib STATIC ${LIB_SOURCES})
 
 find_package(OpenMP)
 if(OpenMP_CXX_FOUND)
