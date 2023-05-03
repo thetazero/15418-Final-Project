@@ -1,8 +1,6 @@
 #include "engine_board.cuh"
-#include <cassert>
 #include <climits>
 #include <stdio.h>
-#include <utility>
 
 pair<int, int> readable_move(int i, int size) {
   return make_pair(i / size, i % size);

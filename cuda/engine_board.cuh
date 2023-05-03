@@ -1,8 +1,8 @@
 #ifndef ENGINE_BOARD_H
 #define ENGINE_BOARD_H
 
-#include "board.cuh"
 #include "eval.cuh"
+#include "board.cuh"
 #include <unordered_set>
 #include <utility>
 #include <vector>

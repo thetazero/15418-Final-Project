@@ -1,11 +1,8 @@
+#include "engine_board.cuh"
+
 #include <stdio.h>
 #include <assert.h>
-#include <cuda.h>
-#include <cuda_runtime.h>
 #include <string>
-
-#include "board.cuh"
-#include "engine_board.cuh"
 
 using namespace std;
 
