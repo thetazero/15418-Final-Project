@@ -51,8 +51,9 @@ void search_position(string file_name, bool prune) {
   for (int d = 1; d <= MAX_DEPTH; d++) {
     search_depth(b, d, false, true, false, prune);
     search_depth(b, d, false, false, false, prune);
-    search_depth(b, d, false, true, true, prune);
-    search_depth(b, d, false, false, true, prune);
+    // search_depth(b, d, false, true, true, prune);
+    // search_depth(b, d, false, false, true, prune);
+    // search_depth(b, d, true, true, true, prune);
   }
 }
 

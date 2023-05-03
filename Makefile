@@ -1,4 +1,4 @@
-CFLAGS := -std=c++14 -fvisibility=hidden -lpthread -O2 -fopenmp
+CFLAGS := -std=c++14 -fvisibility=hidden -lpthread -fopenmp
 ISPC=ispc
 ISPCTARGET=avx1-i32x8
 # ISPCTARGET=sse4
@@ -32,7 +32,7 @@ eval_board: $(HEADERS) $(SOURCES) src/eval_board.cpp
 profile: $(HEADERS) $(SOURCES) src/profile.cpp
 	$(CXX) -o ./prof/$@ $(CFLAGS) src/profile.cpp $(SOURCES) $(OBJS)
 
-clean: 
+clean:
 	rm -f $(TARGETS)
 
 format:

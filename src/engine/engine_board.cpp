@@ -88,7 +88,6 @@ void Engine_Board::get_candidate_moves(vector<int> &moves) {
   // smarter: first keep track of forced move squares (e.g. to stop live 4's and
   // 3's)
   vector<int> critical_4s, critical_3s, empties;
-  
   // if empty board, just return the center square
   if (r_max < 0) {
     moves.push_back(idx(size / 2, size / 2));
@@ -482,7 +481,6 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
 
   // TODO: make a parallel minimax version, and case on which minimax to run
   MinimaxResult result;
-  
   if (fast_mode) {
     result = fast_engine_recommendation(depth);
     lines.push_back(result);
@@ -494,7 +492,6 @@ Engine_Board::engine_recommendation(int depth, int num_lines, bool prune) {
     }
     result = minimax(depth, 0, lines, isMax, INT_MIN, INT_MAX, true);
   }
-
   md.total_time = t.elapsed();
   // md.print();
 
@@ -521,11 +518,14 @@ MinimaxResult Engine_Board::minimax(int max_depth, int depth,
   }
 
   MinimaxResult best_move;
-  int e = eval();
   
-  if (e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
-    return MinimaxResult{e, vector<pair<int, int>>()};
+  if (depth == 0) {
+    int e = eval();
+    if (e == GAME_OVER_EVAL || e == -1 * GAME_OVER_EVAL) {
+      return MinimaxResult{e, vector<pair<int, int>>()};
+    }
   }
+  
 
   // if (depth == 0) {
   //   cout << "Eval: " << e << endl;

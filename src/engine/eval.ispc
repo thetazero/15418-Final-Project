@@ -72,7 +72,7 @@ static inline bool check_direction(int r, int c, int dr, int dc, int &count,
                             board_t *board, int size, int r_min, int r_max,
                             int c_min, int c_max) {
   int start_tile;
-  for (int i = 0; i < 4; i++) {
+  cfor (int i = 0; i < 4; i++) {
     // move to the next tile in direction
     r += dr;
     c += dc;
@@ -116,7 +116,7 @@ static inline int my_min(int n1, int n2) {
 
 static inline int process_counts(int counts[]) {
   int max_x = 0, max_o = 0;
-  for (int i = 0; i < 4; i++) {
+  cfor (int i = 0; i < 4; i++) {
     int c1 = counts[2 * i];
     int c2 = counts[2 * i + 1];
 
@@ -228,7 +228,7 @@ export uniform int eval_ispc(uniform int r_min, uniform int r_max,
   int partial_x_4_count = 0;
   int partial_o_4_count = 0;
   int partial_win_x = 0, partial_win_o = 0;
-  foreach (r = r_min... r_max + 1, c = c_min... c_max + 1) {
+  foreach_tiled (r = r_min... r_max + 1, c = c_min... c_max + 1) {
     // check for 5 in a row if square occupied
     int i = idx(r, c, size);
     

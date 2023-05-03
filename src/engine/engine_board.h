@@ -12,13 +12,13 @@ using namespace std;
 const int GAME_OVER_EVAL = 1000;
 const int INEVITABLE_WIN_4_EVAL = 800;
 const int INEVITABLE_WIN_3_EVAL = 600;
-const int SEARCH_BOUND_PADDING = 2; // number of tiles outside of last chip to search
+const int SEARCH_BOUND_PADDING = 3; // number of tiles outside of last chip to search
 
 struct Search_Metadata {
   int eval_count;
   double eval_time, total_time, ispc_time;
   // map depth to (searched/pruned branches)
-  map<int, pair<int, int>> prune_count; 
+  map<int, pair<int, int>> prune_count;
 
   void print() {
     cout << "---------------------- Search Statistics -------------------------" << endl;
@@ -54,7 +54,7 @@ public:
   void set_parallel_eval_mode(bool parallel);
   void set_parallel_search_mode(bool parallel);
   void set_fast_mode(bool fast);
-  
+
   // move at board position (r,c)
   int make_move(int r, int c);
   // move at board index i
@@ -73,6 +73,7 @@ protected:
   // e.g. if pieces are between (1,1)->(5,5), search bounds are (0,0)->(6,6)
   int r_min, c_min, r_max, c_max;
   bool parallel_eval, parallel_search, fast_mode;
+  bool smart_search; // requires eval at every step, but may lead to more pruning
 
 private:
   // track critical squares
@@ -95,10 +96,10 @@ private:
   int sequential_eval(int &x_4_count, int &o_4_count);
   int ispc_eval(int &x_4_count, int &o_4_count);
   int process_counts(int *counts);
-  
+
   MinimaxResult minimax(int max_depth, int depth, vector<MinimaxResult> &lines,
                         bool isMax, int alpha, int beta, bool prune);
-  
+
   MinimaxResult fast_engine_recommendation(int depth);
   // fast implementation of minimax that only searches for the best move
   int fast_minimax(int max_depth, int depth, bool isMax, int alpha, int beta);
