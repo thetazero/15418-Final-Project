@@ -679,9 +679,9 @@ int Engine_Board::fast_minimax_omp(const int max_depth, const int depth,
   volatile bool flag = false;
 
   int move_count = moves.size();
-  omp_set_num_threads(8);
-#pragma omp parallel for schedule(dynamic) shared(flag)
+#pragma omp parallel for num_threads(8) shared(flag)
   for (int i = 0; i < move_count; i++) {
+    cout << omp_get_num_threads() << endl;
     if (flag)
       continue;
     Engine_Board private_board(*this);
