@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <functional>
 #include <iostream>
+#include <set>
 
 using namespace std;
 
@@ -15,10 +16,14 @@ void benchmark(const int depth,
   vector<Engine_Board> boards;
   size_t i = 0;
   float total_time = 0;
-  for (const auto &board_file :
-       std::filesystem::directory_iterator("../test/boards/")) {
-    cout << board_file.path() << ", ";
-    Engine_Board b(board_file.path());
+  
+  set<filesystem::path> board_files;
+  for (const auto &board_file : filesystem::directory_iterator("../boards/")) {
+    board_files.insert(board_file.path());
+  }
+  for (const auto &board_file : board_files) {
+    cout << board_file << ", ";
+    Engine_Board b(board_file);
 
     Timer timer;
     engine_rec(b, depth);

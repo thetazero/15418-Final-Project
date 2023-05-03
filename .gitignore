@@ -5,7 +5,6 @@ CMakeFiles
 _deps
 build/*
 CMakeCache.txt
-boards/*
 *Makefile*
 *\.cmake
 src/Connect5_run
@@ -13,3 +12,4 @@ src/libConnect5_lib.a
 test/Connect5_test
 cuda/cuda_tests
 cuda/cuda_connect
+benchmark/Connect5_bench
