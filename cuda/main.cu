@@ -2,8 +2,12 @@
 #include <assert.h>
 #include <cuda.h>
 #include <cuda_runtime.h>
-#include "eval.cuh"
-#include "engine_board.h"
+#include <string>
+
+#include "board.cuh"
+#include "engine_board.cuh"
+
+using namespace std;
 
 #define gpuErrchk(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, const char *file, int line, bool abort=true)
@@ -48,9 +52,9 @@ x o . . .
 x o . . .
 x o . . .
 . . . . .)";
-  Engine_Board board(easy_win, 'x', 5);
+   Engine_Board board(easy_win, 'x', 5);
 
-   int move = board.cuda_recommendation(1);
-   cout << "move: " << move << endl;
+   //int move = board.cuda_recommendation(1);
+   //cout << "move: " << move << endl;
    return 0;
 }

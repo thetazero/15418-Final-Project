@@ -1,8 +1,6 @@
-#include "engine_board.h"
-#include <algorithm> // std::reverse
+#include "engine_board.cuh"
 #include <cassert>
 #include <climits>
-#include <omp.h>
 #include <stdio.h>
 #include <utility>
 

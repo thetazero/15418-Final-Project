@@ -1,4 +1,4 @@
-#include "board.h"
+#include "board.cuh"
 
 Board::Board() : Board(19) {}
 

@@ -1,9 +1,9 @@
-#include <cuda.h>
-#include <cuda_runtime.h>
-#include <stdio.h>
-
 #ifndef CUDA_EVAL
 #define CUDA_EVAL
+
+#include <cuda_runtime.h>
+#include <cuda.h>
+#include <stdio.h>
 
 // Get index of cell at row r and column c in a board of size size
 __device__ __inline__
@@ -22,7 +22,7 @@ void update_scratch(int state, int i, char *x_scratch, char *o_scratch) {
 }
 
 /* Given the current state, (where 0 = empty, +n = n x's in a row, -n = n o's in a row)
- *  Process the cell at row r and column c in a board of size size
+ * Process the cell at row r and column c in a board of size size
  * If the cell is empty, update the scratch array
  * Otherwise, update the state to keep track of the streak of x's or o's in the current direction
 */
