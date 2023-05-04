@@ -10,6 +10,8 @@ title: Home
 
 Aleksei Seletskiy, William Wang
 
+[Final Report](15418_Final_Report.pdf)
+
 # Summary
 We are going to try to implement a parallelized engine that plays Connect 5. 
 We will attempt to use task-based parallelism to implement both standard minimax as well as minimax with pruning, as well as speeding up board evaluation with SIMD and possibly CUDA.
