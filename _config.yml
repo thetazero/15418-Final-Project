@@ -30,7 +30,8 @@ theme: minima
 plugins:
   # - jekyll-feed
 exclude: [
-  lib/
+  lib/,
+  boards/
 ]
 
 # Exclude from processing.
