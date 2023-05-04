@@ -31,7 +31,8 @@ plugins:
   # - jekyll-feed
 exclude: [
   lib/,
-  boards/
+  boards/,
+  src/
 ]
 
 # Exclude from processing.
