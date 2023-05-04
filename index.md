@@ -10,7 +10,7 @@ title: Home
 
 Aleksei Seletskiy, William Wang
 
-[Final Project Report](15418_Final_Report.pdf)
+[Final Project Report](images/15418_Final_Report.pdf)
 
 # Summary
 We are going to try to implement a parallelized engine that plays Connect 5. 
