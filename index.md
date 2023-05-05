@@ -10,7 +10,8 @@ title: Home
 
 Aleksei Seletskiy, William Wang
 
-[Final Project Report](images/15418_Final_Report.pdf)
+[Final Project Report](images/15418_Final_Report.pdf),
+[Source Code](https://github.com/thetazero/15418-Final-Project)
 
 # Summary
 We are going to try to implement a parallelized engine that plays Connect 5. 
